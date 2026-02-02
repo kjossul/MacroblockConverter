@@ -10,7 +10,7 @@ I suggest starting by converting a smaller set of macroblocks, so that you can i
 
 ## Install guide
 
-Go to Releases, download the zip file and run the executable.
+Go to Releases, download the zip file, extract it and run the executable.
 
 ## Usage
 
