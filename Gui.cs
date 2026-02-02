@@ -87,15 +87,15 @@ public class MainForm : Form
 
         nullifyVariantsCheckbox = new CheckBox
         {
-            Location = new Point(20, 135),
+            Location = new Point(20, 130),
             Size = new Size(20, 20),
             Checked = true
         };
 
         Label nullifyVariantsLabel = new Label
         {
-            Text = "Set base variants",
-            Location = new Point(45, 137),
+            Text = "Set base block variants",
+            Location = new Point(45, 132),
             Size = new Size(180, 20),
             Font = new Font("Segoe UI", 9F)
         };

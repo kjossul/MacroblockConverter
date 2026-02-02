@@ -4,9 +4,10 @@ This app batch converts macroblocks into valid ones for the four new Vistas (Red
 
 ## Warnings
 
-Your game will crash if you open the editor with an invalid Macroblock. I had success converting simple routes, but had trouble converting successfully more complicated macroblocks (for instance, the Ascki scenery set). I still don't know which blocks are causing the crashes.
+Your game will crash if you open the editor with an invalid Macroblock.
 
-I suggest starting by converting a smaller set of macroblocks, so that you can identify the faulty ones more easily.
+I suggest converting by keeping the `Set base block variants` option checked.
+If you have a macroblock that causes an editor crash, please open an issue and let me know.
 
 ## Install guide
 
@@ -26,3 +27,7 @@ You can specify three options:
 I'm not an experienced C# dev, nor GBX expert. Any PR is welcome, as I'm probably missing many details.
 
 The current implementation simply checks for allowed suffixes/prefixes in the block name, and replaces the `Ident` field in the macroblock and on each block with the correct one for each vista. Furthermore, it clears the `AutoTerrain` array, as in my experienced it caused crashing.
+
+## Thanks to
+
+Special thanks to Zai for letting me know about the issue with block variants, now the program sets base block variants if specified.
