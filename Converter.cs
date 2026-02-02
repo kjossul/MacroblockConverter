@@ -7,6 +7,7 @@ public class MacroblockConverter
     private readonly List<string> sourceFiles;
     private readonly bool preserveTrimmed;
     private readonly bool createSubfolder;
+    private readonly bool nullifyVariants;
     private readonly Action<string> logger;
     private readonly string[] excludedPrefixes = 
     [
@@ -15,7 +16,7 @@ public class MacroblockConverter
     ];
     private readonly string[] allowedPrefixes =
     [
-        "DecoWallBase", "DecoWallSlope2Straight" //, "DecoWallDiag1"
+        "DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1"
         // TODO decowalldiag1 needs the flags property to be set to 0, while in stadium it has value of 65536
     ];
     private readonly string[] excludedSuffixes =
@@ -31,11 +32,12 @@ public class MacroblockConverter
         { "WhiteShore", 29 }
     };
 
-    public MacroblockConverter(List<string> sourceFiles, bool preserveTrimmed, bool createSubfolder, Action<string> logger)
+    public MacroblockConverter(List<string> sourceFiles, bool preserveTrimmed, bool createSubfolder, bool nullifyVariants, Action<string> logger)
     {
         this.sourceFiles = sourceFiles;
         this.preserveTrimmed = preserveTrimmed;
         this.createSubfolder = createSubfolder;
+        this.nullifyVariants = nullifyVariants;
         this.logger = logger;
         
         Gbx.LZO = new Lzo();
@@ -54,7 +56,7 @@ public class MacroblockConverter
             try
             {
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
-                macroBlock.AutoTerrains = [];  // FIXME is there any way to keep this while avoiding crashes?
+                macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock.BlockSpawns);
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
@@ -161,7 +163,7 @@ public class MacroblockConverter
 
             if (isValid)
             {
-                // perform conversions
+                // perform name conversions
                 if (blockName.Equals("DecoWallBase"))
                 {
                     blockName = blockName.Replace("DecoWallBase", "DecoWallBasePillar");
@@ -175,6 +177,11 @@ public class MacroblockConverter
                     blockName = blockName.Replace("Ice", "");
                 }
                 block.BlockModel = new Ident(blockName, block.BlockModel.Collection, block.BlockModel.Author);
+                // nullify variants
+                if (nullifyVariants)
+                {
+                    block.Flags = (int)((uint)block.Flags & 0xFF000000u);
+                }
                 validBlocks.Add(block);
             }
         }

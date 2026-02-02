@@ -1,8 +1,9 @@
 public class MainForm : Form
 {
-    private Button selectMacroblocksButton;
+    private Button selectFolderButton;
     private CheckBox preserveTrimmedCheckbox;
     private CheckBox createSubfolderCheckbox;
+    private CheckBox nullifyVariantsCheckbox;
     private Label preserveTrimmedLabel;
     private Label infoLabel;
     private Button convertButton;
@@ -27,14 +28,14 @@ public class MainForm : Form
         this.MinimumSize = new Size(600, 400);
         this.StartPosition = FormStartPosition.CenterScreen;
 
-        selectMacroblocksButton = new Button
+        selectFolderButton = new Button
         {
-            Text = "Select Macroblocks",
+            Text = "Select Folder",
             Location = new Point(20, 20),
             Size = new Size(150, 35),
             Font = new Font("Segoe UI", 9F)
         };
-        selectMacroblocksButton.Click += SelectMacroblocksButtonClick;
+        selectFolderButton.Click += SelectFolderButtonClick;
 
         preserveTrimmedCheckbox = new CheckBox
         {
@@ -84,10 +85,25 @@ public class MainForm : Form
             Font = new Font("Segoe UI", 9F)
         };
 
+        nullifyVariantsCheckbox = new CheckBox
+        {
+            Location = new Point(20, 135),
+            Size = new Size(20, 20),
+            Checked = true
+        };
+
+        Label nullifyVariantsLabel = new Label
+        {
+            Text = "Set base variants",
+            Location = new Point(45, 137),
+            Size = new Size(180, 20),
+            Font = new Font("Segoe UI", 9F)
+        };
+
         convertButton = new Button
         {
             Text = "Convert",
-            Location = new Point(20, 135),
+            Location = new Point(20, 165),
             Size = new Size(150, 35),
             Font = new Font("Segoe UI", 9F),
             Enabled = false
@@ -96,7 +112,7 @@ public class MainForm : Form
 
         logTextBox = new TextBox
         {
-            Location = new Point(20, 185),
+            Location = new Point(20, 215),
             Size = new Size(640, 330),
             Multiline = true,
             ScrollBars = ScrollBars.Vertical,
@@ -105,17 +121,19 @@ public class MainForm : Form
             Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
         };
 
-        this.Controls.Add(selectMacroblocksButton);
+        this.Controls.Add(selectFolderButton);
         this.Controls.Add(preserveTrimmedCheckbox);
         this.Controls.Add(preserveTrimmedLabel);
         this.Controls.Add(infoLabel);
         this.Controls.Add(createSubfolderCheckbox);
         this.Controls.Add(createConvertedLabel);
+        this.Controls.Add(nullifyVariantsCheckbox);
+        this.Controls.Add(nullifyVariantsLabel);
         this.Controls.Add(convertButton);
         this.Controls.Add(logTextBox);
     }
 
-    private void SelectMacroblocksButtonClick(object sender, EventArgs e)
+    private void SelectFolderButtonClick(object sender, EventArgs e)
     {
         using (var folderDialog = new FolderBrowserDialog())
         {
@@ -154,7 +172,7 @@ public class MainForm : Form
 
         LogMessage("\n=== Starting Conversion ===");
         convertButton.Enabled = false;
-        selectMacroblocksButton.Enabled = false;
+        selectFolderButton.Enabled = false;
 
         try
         {
@@ -162,6 +180,7 @@ public class MainForm : Form
                 selectedFiles, 
                 preserveTrimmedCheckbox.Checked,
                 createSubfolderCheckbox.Checked,
+                nullifyVariantsCheckbox.Checked,
                 LogMessage
             );
             
@@ -178,7 +197,7 @@ public class MainForm : Form
         finally
         {
             convertButton.Enabled = true;
-            selectMacroblocksButton.Enabled = true;
+            selectFolderButton.Enabled = true;
         }
     }
 

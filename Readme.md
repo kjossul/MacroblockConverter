@@ -16,9 +16,10 @@ Go to Releases, download the zip file, extract it and run the executable.
 
 You'll be prompted to select a folder. The program will convert all macroblocks found in the given folder and subfolders, and place them in the corresponding directory for the new Vistas.
 
-You can specify two options:
+You can specify three options:
 - Whether to create or not the "Converted" top level folder
 - Whether to preserve or not trimmed blocks. If this is checked, macroblocks with invalid blocks will still be converted, but the invalid blocks will be removed. If this is unchecked, the macroblock gets skipped completely.
+- Whether to keep only the base variant for each block. With this option enabled, only the placement mode for each block is stored, the remaining part of the block variant information stored in `Flags` is discarded. 
 
 ## For developers
 
