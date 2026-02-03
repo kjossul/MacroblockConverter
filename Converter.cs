@@ -1,14 +1,14 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.LZO;
+using System.IO;
 
-public class MacroblockConverter
+public class Converter
 {
     private readonly List<string> sourceFiles;
     private readonly bool preserveTrimmed;
-    private readonly bool createSubfolder;
     private readonly bool nullifyVariants;
-    private readonly Action<string> logger;
+    private readonly Action<string> log;
     private readonly string[] excludedPrefixes = 
     [
         "SnowRoad", "RallyCastle", "RallyRoad", "TrackWall", "DecoWall", "StructureStraightInTrackWall", "Canopy",
@@ -17,7 +17,6 @@ public class MacroblockConverter
     private readonly string[] allowedPrefixes =
     [
         "DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1"
-        // TODO decowalldiag1 needs the flags property to be set to 0, while in stadium it has value of 65536
     ];
     private readonly string[] excludedSuffixes =
     [
@@ -29,16 +28,15 @@ public class MacroblockConverter
         { "BlueBay", 28 },
         { "GreenCoast", 15 },
         { "RedIsland", 16 },
-        { "WhiteShore", 29 }
+        { "WhiteShore", 29 },
     };
 
-    public MacroblockConverter(List<string> sourceFiles, bool preserveTrimmed, bool createSubfolder, bool nullifyVariants, Action<string> logger)
+    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, Action<string> log)
     {
         this.sourceFiles = sourceFiles;
         this.preserveTrimmed = preserveTrimmed;
-        this.createSubfolder = createSubfolder;
         this.nullifyVariants = nullifyVariants;
-        this.logger = logger;
+        this.log = log;
         
         Gbx.LZO = new Lzo();
     }
@@ -53,6 +51,8 @@ public class MacroblockConverter
 
         foreach (var sourceFile in sourceFiles)
         {
+            string baseBlocksPath = GetBaseBlocksPath(sourceFile);
+            string relativePath = GetRelativePath(baseBlocksPath, sourceFile);
             try
             {
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
@@ -61,14 +61,14 @@ public class MacroblockConverter
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
                 {
-                    logger($"{sourceFile} Skipped: contains no convertible Macroblocks or items.");
+                    log($"{sourceFile} Skipped: contains no convertible Macroblocks or items.");
                     totalSkipped++;
                     continue;
                 }          
 
                 if (!preserveTrimmed && validBlocks.Count < macroBlock.BlockSpawns.Count)
                 {
-                    logger($"{sourceFile} Skipped: Macroblocks has some invalid blocks.");
+                    log($"{sourceFile} Skipped: Macroblocks has some invalid blocks.");
                     totalSkipped++;
                     continue;
                 }
@@ -77,9 +77,7 @@ public class MacroblockConverter
                     string envName = env.Key;
                     int collectionId = env.Value;
 
-                    string baseBlocksPath = GetBaseBlocksPath(sourceFile);
-                    string relativePath = GetRelativePath(baseBlocksPath, sourceFile);
-                    string destFolder = Path.Combine(baseBlocksPath, envName, createSubfolder ? "Converted" : "");
+                    string destFolder = Path.Combine(baseBlocksPath, envName, "Converted");
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
 
@@ -108,15 +106,15 @@ public class MacroblockConverter
             }
             catch (Exception ex)
             {
-                logger($"Error processing file {sourceFile}: {ex.Message}");
+                log($"Error processing file {sourceFile}: {ex.Message}");
                 totalSkipped++;
             }
         }
 
-        logger($"\n=== Summary ===");
-        logger($"Total conversions: {totalConverted}");
-        logger($"Files skipped: {totalSkipped}");
-        logger($"Files processed: {sourceFiles.Count}");
+        log($"\n=== Summary ===");
+        log($"Total conversions: {totalConverted}");
+        log($"Files skipped: {totalSkipped}");
+        log($"Files processed: {sourceFiles.Count}");
     }
 
     private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(IList<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
