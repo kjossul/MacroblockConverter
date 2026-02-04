@@ -32,4 +32,5 @@ The current implementation simply checks for allowed suffixes/prefixes in the bl
 
 ## Thanks to
 
-Special thanks to Zai for letting me know about the issue with block variants, now the program sets base block variants if specified.
+- BigBang1112 for the awesome work on [GBX.NET](https://github.com/BigBang1112/gbx-net)
+- Zai for letting me know about the issue with block variants, now the program sets base block variants if specified.
