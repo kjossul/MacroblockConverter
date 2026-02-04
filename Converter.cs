@@ -59,14 +59,14 @@ public class Converter
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
                 {
-                    log($"{sourceFile} Skipped: contains no convertible Macroblocks or items.");
+                    log($"{sourceFile} Skipped: contains no convertible blocks or items.");
                     totalSkipped++;
                     continue;
                 }          
 
                 if (!preserveTrimmed && validBlocks.Count < macroBlock.BlockSpawns.Count)
                 {
-                    log($"{sourceFile} Skipped: Macroblocks has some invalid blocks.");
+                    log($"{sourceFile} Skipped: Macroblock has some invalid blocks.");
                     totalSkipped++;
                     continue;
                 }
