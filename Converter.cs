@@ -8,6 +8,7 @@ public class Converter
     private readonly List<string> sourceFiles;
     private readonly bool preserveTrimmed;
     private readonly bool nullifyVariants;
+    private readonly bool createConvertedFolder;
     private readonly Action<string> log;
     private readonly string[] excludedPrefixes = 
     [
@@ -31,11 +32,12 @@ public class Converter
         { "WhiteShore", 29 },
     };
 
-    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, Action<string> log)
+    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, Action<string> log)
     {
         this.sourceFiles = sourceFiles;
         this.preserveTrimmed = preserveTrimmed;
         this.nullifyVariants = nullifyVariants;
+        this.createConvertedFolder = createConvertedFolder;
         this.log = log;
         
         Gbx.LZO = new Lzo();
@@ -43,10 +45,6 @@ public class Converter
 
     public void Convert()
     {
-        string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        string blocksBasePath = Path.Combine(documentsPath, @"Trackmania\Blocks");
-        
-        int totalConverted = 0;
         int totalSkipped = 0;
 
         foreach (var sourceFile in sourceFiles)
@@ -76,8 +74,8 @@ public class Converter
                 {
                     string envName = env.Key;
                     int collectionId = env.Value;
-
-                    string destFolder = Path.Combine(baseBlocksPath, envName, "Converted");
+                    if (macroBlock.Ident.Collection.Number == collectionId) { continue; }
+                    string destFolder = Path.Combine(baseBlocksPath, envName, createConvertedFolder ? "Converted" : "");
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
 
@@ -101,7 +99,6 @@ public class Converter
                     );
                     macroBlock.BlockSpawns = validBlocks;
                     macroBlock.Save(destPath);
-                    totalConverted++;
                 }
             }
             catch (Exception ex)
@@ -111,10 +108,9 @@ public class Converter
             }
         }
 
-        log($"\n=== Summary ===");
-        log($"Total conversions: {totalConverted}");
-        log($"Files skipped: {totalSkipped}");
-        log($"Files processed: {sourceFiles.Count}");
+        log($"=== Summary ===");
+        log($"Converted: {sourceFiles.Count - totalSkipped}");
+        log($"Skipped: {totalSkipped}");
     }
 
     private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(IList<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
@@ -162,6 +158,7 @@ public class Converter
             if (isValid)
             {
                 // perform name conversions
+                // TODO convert on the opposite direction for stadium
                 if (blockName.Equals("DecoWallBase"))
                 {
                     blockName = blockName.Replace("DecoWallBase", "DecoWallBasePillar");

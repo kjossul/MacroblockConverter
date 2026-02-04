@@ -2,6 +2,8 @@
 
 This app batch converts macroblocks into valid ones for the four new Vistas (Red Island, Green Coast, Blue Bay, White Shore). Note that many blocks are not available in the new Vistas, so they will be skipped during conversion.
 
+![Screenshot](Screenshots/Screenshot.png)
+
 ## Warnings
 
 Your game will crash if you open the editor with an invalid Macroblock.
@@ -17,15 +19,16 @@ Go to Releases, download the zip file, extract it and run the executable.
 
 You'll be prompted to select a folder. The program will convert all macroblocks found in the given folder and subfolders, and place them in the corresponding directory for the new Vistas.
 
-You can specify two options:
-- Whether to preserve or not trimmed blocks. If this is checked, macroblocks with invalid blocks will still be converted, but the invalid blocks will be removed. If this is unchecked, the macroblock gets skipped completely.
-- Whether to keep only the base variant for each block. With this option enabled, only the placement mode for each block is stored, the remaining part of the block variant information stored in `Flags` is discarded. 
+You can specify three options:
+- `Preserve trimmed blocks`: if this is checked, macroblocks with invalid blocks will still be converted, but the invalid blocks will be removed. If this is unchecked, the macroblock gets skipped completely.
+- `Set base variants`: with this option enabled, only the placement mode for each block is stored, the remaining part of the block variant information stored in `Flags` is discarded. 
+- `Create 'Converted' folder`: put all the converted blocks into a named folder for each Vista.
 
 ## For developers
 
 I'm not an experienced C# dev, nor GBX expert. Any PR is welcome, as I'm probably missing many details.
 
-The current implementation simply checks for allowed suffixes/prefixes in the block name, and replaces the `Ident` field in the macroblock and on each block with the correct one for each vista. Furthermore, it clears the `AutoTerrain` array, as in my experienced it caused crashing.
+The current implementation simply checks for allowed suffixes/prefixes in the block name, and replaces the `Ident` field in the macroblock and on each block with the correct one for each vista. Furthermore, it clears the `AutoTerrain` array, as in my experience it caused crashing.
 
 ## Thanks to
 

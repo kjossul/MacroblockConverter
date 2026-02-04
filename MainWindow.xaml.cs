@@ -58,7 +58,12 @@ namespace MacroblockConverter
         private async void convertButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             convertButton.IsEnabled = false;
-            Converter converter = new Converter(selectedFiles, preserveTrimmedCheckbox.IsChecked ?? false, nullifyVariantsCheckbox.IsChecked ?? false, Log);
+            Converter converter = new Converter(
+                selectedFiles, 
+                preserveTrimmedCheckbox.IsChecked ?? false, 
+                nullifyVariantsCheckbox.IsChecked ?? false,
+                createConvertedFolderCheckbox.IsChecked ?? false,
+                Log);
             Log("=== Starting Conversion ===");
             await Task.Run(() => converter.Convert());
             Log("=== Conversion Complete ===");

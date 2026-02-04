@@ -6,12 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-	 <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+	<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GBX.NET" Version="2.3.2" />
+    <PackageReference Include="GBX.NET" Version="2.3.2-nightly.20260204.c36b2750" />
     <PackageReference Include="GBX.NET.LZO" Version="2.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Screenshots\" />
   </ItemGroup>
 
 </Project>
