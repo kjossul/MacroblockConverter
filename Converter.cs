@@ -72,7 +72,7 @@ public class Converter
             }
             if (baseBlocksPath == null)
             {
-                log("Didn't find 'Blocks' directory in block path, please work with the standard game filesystem.");
+                log("Didn't find 'Blocks' directory in block path, please work within the standard game filesystem.");
                 return;
             }
             try
@@ -150,7 +150,8 @@ public class Converter
             if (blockToItem.ContainsKey(block.BlockModel.Id) && (block.Flags >> 24) < 2)
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
-                objectSpawn.ItemModel = new Ident(blockToItem[block.BlockModel.Id], 26, "DSCukfohR1m0kA6A_8pJ9w");
+                var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
+                objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, "DSCukfohR1m0kA6A_8pJ9w");
                 objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
                 var pitch = block.Direction switch
                 {
