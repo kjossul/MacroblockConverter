@@ -10,7 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GBX.NET" Version="2.3.2-nightly.20260204.c36b2750" />
+    <None Remove="conversions.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="conversions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GBX.NET" Version="2.3.3" />
     <PackageReference Include="GBX.NET.LZO" Version="2.1.4" />
   </ItemGroup>
 

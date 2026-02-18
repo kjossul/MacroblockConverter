@@ -63,6 +63,7 @@ namespace MacroblockConverter
                 preserveTrimmedCheckbox.IsChecked ?? false, 
                 nullifyVariantsCheckbox.IsChecked ?? false,
                 createConvertedFolderCheckbox.IsChecked ?? false,
+                convertBlocksToItems.IsChecked ?? false,
                 Log);
             Log("=== Starting Conversion ===");
             await Task.Run(() => converter.Convert());

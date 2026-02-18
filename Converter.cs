@@ -1,7 +1,9 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
+using GBX.NET.Engines.GameData;
 using GBX.NET.LZO;
 using System.IO;
+using System.Text.Json;
 
 public class Converter
 {
@@ -9,8 +11,9 @@ public class Converter
     private readonly bool preserveTrimmed;
     private readonly bool nullifyVariants;
     private readonly bool createConvertedFolder;
+    private readonly bool convertBlocksToItems;
     private readonly Action<string> log;
-    private readonly string[] excludedPrefixes = 
+    private readonly string[] excludedPrefixes =
     [
         "SnowRoad", "RallyCastle", "RallyRoad", "TrackWall", "DecoWall", "StructureStraightInTrackWall", "Canopy",
         "RoadWater", "PlatformWater", "Water", "Stage", "DecoHill", "DecoCliff"
@@ -21,25 +24,27 @@ public class Converter
     ];
     private readonly string[] excludedSuffixes =
     [
-        "TurboRoulette"      
+        "TurboRoulette"
     ];
-    
+
     private readonly Dictionary<string, int> environments = new()
     {
         { "BlueBay", 28 },
         { "GreenCoast", 15 },
         { "RedIsland", 16 },
         { "WhiteShore", 29 },
+        { "Stadium", 26 }
     };
 
-    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, Action<string> log)
+    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, Action<string> log)
     {
         this.sourceFiles = sourceFiles;
         this.preserveTrimmed = preserveTrimmed;
         this.nullifyVariants = nullifyVariants;
         this.createConvertedFolder = createConvertedFolder;
+        this.convertBlocksToItems = convertBlocksToItems;
         this.log = log;
-        
+
         Gbx.LZO = new Lzo();
     }
 
@@ -47,22 +52,45 @@ public class Converter
     {
         int totalSkipped = 0;
 
+        string blocksListFilePath = AppDomain.CurrentDomain.BaseDirectory + @"conversions.json";
+        Dictionary<string, string> blockToItem = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(blocksListFilePath));
+
         foreach (var sourceFile in sourceFiles)
         {
-            string baseBlocksPath = GetBaseBlocksPath(sourceFile);
-            string relativePath = GetRelativePath(baseBlocksPath, sourceFile);
+            // find base blocks directory and relative path (might be in Trackmania2020 instead of Trackmania if double install with TMNF)
+            string[] parts = Path.GetFullPath(sourceFile).Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]);
+            string baseBlocksPath = null;
+            string relativePath = null;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (parts[i].Equals("Blocks", StringComparison.OrdinalIgnoreCase))
+                {
+                    baseBlocksPath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Take(i + 1));
+                    relativePath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(i + 2));
+                    break;
+                }
+            }
+            if (baseBlocksPath == null)
+            {
+                log("Didn't find 'Blocks' directory in block path, please work with the standard game filesystem.");
+                return;
+            }
             try
             {
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
+                var sourceEnv = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock.BlockSpawns);
+                if (convertBlocksToItems) { 
+                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, blockToItem));
+                }
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
                 {
                     log($"{sourceFile} Skipped: contains no convertible Macroblocks or items.");
                     totalSkipped++;
                     continue;
-                }          
+                }
 
                 if (!preserveTrimmed && validBlocks.Count < macroBlock.BlockSpawns.Count)
                 {
@@ -74,7 +102,7 @@ public class Converter
                 {
                     string envName = env.Key;
                     int collectionId = env.Value;
-                    if (macroBlock.Ident.Collection.Number == collectionId) { continue; }
+                    if (sourceEnv == collectionId) { continue; }
                     string destFolder = Path.Combine(baseBlocksPath, envName, createConvertedFolder ? "Converted" : "");
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
@@ -111,6 +139,38 @@ public class Converter
         log($"=== Summary ===");
         log($"Converted: {sourceFiles.Count - totalSkipped}");
         log($"Skipped: {totalSkipped}");
+    }
+
+    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns, Dictionary<string, string>? blockToItem)
+    {
+        var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
+        foreach (var block in blockSpawns)
+        {
+            // check if there is a corresponding item, and this block is not placed in freeblock mode
+            if (blockToItem.ContainsKey(block.BlockModel.Id) && (block.Flags >> 24) < 2)
+            {
+                var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
+                objectSpawn.ItemModel = new Ident(blockToItem[block.BlockModel.Id], 26, "DSCukfohR1m0kA6A_8pJ9w");
+                objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
+                var pitch = block.Direction switch
+                {
+                    Direction.North => 0,
+                    Direction.East => -Math.PI / 2,
+                    Direction.South => -Math.PI,
+                    Direction.West => Math.PI/2,
+                };
+                objectSpawn.PitchYawRoll = new Vec3((float) pitch, 0, 0);
+                objectSpawn.BlockCoord = block.Coord;
+                objectSpawn.AbsolutePositionInMap = block.Coord * (32,8,32) - objectSpawn.PivotPosition;
+                objectSpawn.Scale = 1;
+                objectSpawn.Version = 14;
+                objectSpawn.U03 = 1;
+                objectSpawn.U04 = new Int3(-1, -1, -1);
+                objectSpawn.U10 = -1;
+                objectSpawns.Add(objectSpawn);
+            }
+        }
+        return objectSpawns;
     }
 
     private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(IList<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
@@ -172,46 +232,14 @@ public class Converter
                     blockName = blockName.Replace("Ice", "");
                 }
                 block.BlockModel = new Ident(blockName, block.BlockModel.Collection, block.BlockModel.Author);
-                // nullify variants
                 if (nullifyVariants)
                 {
-                    block.Flags = (int)((uint)block.Flags & 0xFF000000u);
+                    block.Flags = (int)((uint)block.Flags & 0xFF000000u);  // preserve only placement mode
                 }
                 validBlocks.Add(block);
             }
         }
 
         return validBlocks;
-    }
-
-    private string GetBaseBlocksPath(string sourceFile)
-    {
-        string[] parts = sourceFile.Split(Path.DirectorySeparatorChar);
-        
-        for (int i = 0; i < parts.Length; i++)
-        {
-            if (parts[i].Equals("Blocks", StringComparison.OrdinalIgnoreCase))
-            {
-                // Reconstruct path up to and including "Blocks"
-                return string.Join(Path.DirectorySeparatorChar.ToString(), parts.Take(i + 1));
-            }
-        }
-        
-        // Fallback: use Documents/Trackmania/Blocks
-        string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        return Path.Combine(documentsPath, @"Trackmania\Blocks");
-    }
-    private string GetRelativePath(string basePath, string sourceFile)
-    {
-        string afterBlocks = Path.GetRelativePath(basePath, sourceFile);
-        
-        // Remove the first folder (Stadium or whatever environment it's in)
-        string[] parts = afterBlocks.Split(Path.DirectorySeparatorChar);
-        if (parts.Length > 1)
-        {
-            return string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(1));
-        }
-        
-        return Path.GetFileName(sourceFile);
     }
 }

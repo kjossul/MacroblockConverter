@@ -9,11 +9,12 @@
     <Grid>
         <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_Click" Content="Choose folder"/>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Macroblock Converter" VerticalAlignment="Top" Height="35" Width="252" FontWeight="Bold" FontSize="24" Margin="0,10,0,0"/>
-        <ListBox x:Name="logBox" Margin="10,207,10,10"/>
+        <ListBox x:Name="logBox" Margin="10,233,10,10"/>
         <CheckBox x:Name="preserveTrimmedCheckbox" Content="Preserve trimmed macroblocks" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="nullifyVariantsCheckbox" Content="Set base variants" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
+        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
         <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="convertBlocksToItems" Content="Convert invalid blocks to items" HorizontalAlignment="Left" Margin="10,163,0,0" VerticalAlignment="Top" IsChecked="True"/>
 
     </Grid>
 </Window>
