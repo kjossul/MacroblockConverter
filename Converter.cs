@@ -16,7 +16,7 @@ public class Converter
     private readonly string[] excludedPrefixes =
     [
         "SnowRoad", "RallyCastle", "RallyRoad", "TrackWall", "DecoWall", "StructureStraightInTrackWall", "Canopy",
-        "RoadWater", "PlatformWater", "Water", "Stage", "DecoHill", "DecoCliff"
+        "RoadWater", "PlatformWater", "Water", "Stage", "DecoHill", "DecoCliff", "OpenDirtRoadToRoadIn", "RoadTechToTheme"
     ];
     private readonly string[] allowedPrefixes =
     [
@@ -24,7 +24,7 @@ public class Converter
     ];
     private readonly string[] excludedSuffixes =
     [
-        "TurboRoulette"
+        "TurboRoulette", "ToDecoWall", "ToDecoWallCurve1Out", "ToDecoWallCurve1In"
     ];
 
     private readonly Dictionary<string, int> environments = new()
@@ -80,7 +80,7 @@ public class Converter
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
                 var sourceEnv = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
-                var validBlocks = CollectValidBlocks(macroBlock.BlockSpawns);
+                var validBlocks = CollectValidBlocks(macroBlock);
                 if (convertBlocksToItems) { 
                     macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, blockToItem));
                 }
@@ -102,7 +102,7 @@ public class Converter
                 {
                     string envName = env.Key;
                     int collectionId = env.Value;
-                    if (sourceEnv == collectionId) { continue; }
+                    if (sourceEnv == collectionId) { continue; }  // don't convert to the same environment
                     string destFolder = Path.Combine(baseBlocksPath, envName, createConvertedFolder ? "Converted" : "");
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
@@ -114,8 +114,17 @@ public class Converter
 
                     foreach (var block in validBlocks)
                     {
+                        var blockName = block.BlockModel.Id;
+
+                        if (blockName.Equals("DecoWallBase"))
+                        {
+                            blockName = "DecoWallBasePillar";
+                        } else if (blockName.Equals("DecoWallBasePillar") && collectionId == 26)  // we are converting from a vista back to stadium
+                        {
+                            blockName = "DecoWallBase";
+                        }
                         block.BlockModel = new Ident(
-                            block.BlockModel.Id,
+                            blockName,
                             collectionId,
                             block.BlockModel.Author
                         );
@@ -146,8 +155,8 @@ public class Converter
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
         foreach (var block in blockSpawns)
         {
-            // check if there is a corresponding item, and this block is not placed in freeblock mode
-            if (blockToItem.ContainsKey(block.BlockModel.Id) && (block.Flags >> 24) < 2)
+            // check if there is a corresponding item, and this block is not placed in freeblock mode (=4)
+            if (blockToItem.ContainsKey(block.BlockModel.Id) && (block.Flags >> 24) <= 2)
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
@@ -156,7 +165,7 @@ public class Converter
                 var pitch = block.Direction switch
                 {
                     Direction.North => 0,
-                    Direction.East => -Math.PI / 2,
+                    Direction.East => -Math.PI/2,
                     Direction.South => -Math.PI,
                     Direction.West => Math.PI/2,
                 };
@@ -167,6 +176,7 @@ public class Converter
                 objectSpawn.Version = 14;
                 objectSpawn.U03 = 1;
                 objectSpawn.U04 = new Int3(-1, -1, -1);
+                objectSpawn.U05 = (byte)block.U02;  // assign color
                 objectSpawn.U10 = -1;
                 objectSpawns.Add(objectSpawn);
             }
@@ -174,8 +184,9 @@ public class Converter
         return objectSpawns;
     }
 
-    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(IList<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
+    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock)
     {
+        var blockSpawns = macroBlock.BlockSpawns;
         var validBlocks = new List<CGameCtnMacroBlockInfo.BlockSpawn>();
 
         foreach (var block in blockSpawns)
@@ -219,12 +230,7 @@ public class Converter
             if (isValid)
             {
                 // perform name conversions
-                // TODO convert on the opposite direction for stadium
-                if (blockName.Equals("DecoWallBase"))
-                {
-                    blockName = blockName.Replace("DecoWallBase", "DecoWallBasePillar");
-                }
-                else if (blockName.StartsWith("DecoPlatformDirt"))
+                if (blockName.StartsWith("DecoPlatformDirt"))
                 {
                     blockName = blockName.Replace("Dirt", "");
                 }
