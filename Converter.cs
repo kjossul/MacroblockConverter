@@ -156,22 +156,36 @@ public class Converter
         foreach (var block in blockSpawns)
         {
             // check if there is a corresponding item, and this block is not placed in freeblock mode (=4)
-            if (blockToItem.ContainsKey(block.BlockModel.Id) && (block.Flags >> 24) <= 2)
+            var placementMode = block.Flags >> 24;
+            if (blockToItem.ContainsKey(block.BlockModel.Id))
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, "DSCukfohR1m0kA6A_8pJ9w");
                 objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
-                var pitch = block.Direction switch
+                if (placementMode <= 2)  // normal / ghost
                 {
-                    Direction.North => 0,
-                    Direction.East => -Math.PI/2,
-                    Direction.South => -Math.PI,
-                    Direction.West => Math.PI/2,
-                };
-                objectSpawn.PitchYawRoll = new Vec3((float) pitch, 0, 0);
-                objectSpawn.BlockCoord = block.Coord;
-                objectSpawn.AbsolutePositionInMap = block.Coord * (32,8,32) - objectSpawn.PivotPosition;
+                    var pitch = block.Direction switch
+                    {
+                        Direction.North => 0,
+                        Direction.East => -Math.PI / 2,
+                        Direction.South => -Math.PI,
+                        Direction.West => Math.PI / 2,
+                    };
+                    objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
+                    objectSpawn.BlockCoord = block.Coord;
+                    objectSpawn.AbsolutePositionInMap = block.Coord * (32, 8, 32) - objectSpawn.PivotPosition;
+                } else  // freeblock
+                {
+                    objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap - objectSpawn.PivotPosition;
+                    objectSpawn.BlockCoord = new Int3(
+                        (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.X / 32),
+                        (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Y / 8),
+                        (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Z / 32)
+                        );
+                    objectSpawn.PitchYawRoll = block.PitchYawRoll;
+
+                }
                 objectSpawn.Scale = 1;
                 objectSpawn.Version = 14;
                 objectSpawn.U03 = 1;
