@@ -24,7 +24,7 @@ public class Converter
     ];
     private readonly string[] excludedSuffixes =
     [
-        "TurboRoulette", "ToDecoWall", "ToDecoWallCurve1Out", "ToDecoWallCurve1In"
+        "TurboRoulette", "ToDecoWall", "ToDecoWallCurve1Out", "ToDecoWallCurve1In", "InTrackWallStraight"
     ];
 
     private readonly Dictionary<string, int> environments = new()

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace MacroblockConverter
 {
@@ -11,12 +12,14 @@ namespace MacroblockConverter
     public partial class MainWindow : Window
     {
         private List<string> selectedFiles = new List<string>();
+        private List<CheckBox> convertOptions = new List<CheckBox>();
         public ObservableCollection<string> LogMessages { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             LogMessages = new ObservableCollection<string>();
+            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, DecoCliffCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox};
             logBox.ItemsSource = LogMessages;
         }
 
@@ -36,7 +39,29 @@ namespace MacroblockConverter
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_File_Click(object sender, RoutedEventArgs e)
+        { 
+            OpenFileDialog ofd = new OpenFileDialog();
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string defaultPath = Path.Combine(documentsPath, @"Trackmania\Blocks\Stadium\");
+            ofd.InitialDirectory = Directory.Exists(defaultPath) ? defaultPath : documentsPath;
+            ofd.Multiselect = true;
+            ofd.Filter = "Macroblocks|*.Macroblock.Gbx";
+            LogMessages.Clear();
+            selectedFiles.Clear();
+            if (ofd.ShowDialog().GetValueOrDefault())
+            {
+                selectedFiles.AddRange(ofd.FileNames);
+                convertButton.IsEnabled = true;
+                Log($"Selected {selectedFiles.Count} macroblock(s).");
+            }
+            else
+            {
+                convertButton.IsEnabled = false;
+            }
+        }
+
+        private void Button_Folder_Click(object sender, RoutedEventArgs e)
         {
             OpenFolderDialog ofd = new OpenFolderDialog();
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -67,8 +92,17 @@ namespace MacroblockConverter
                 Log);
             Log("=== Starting Conversion ===");
             await Task.Run(() => converter.Convert());
+            convertButton.IsEnabled = true;
             Log("=== Conversion Complete ===");
             Log("Remember to restart your game!");
+        }
+
+        private void convertBlocksToItems_Clicked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox cb in convertOptions)
+            {
+                cb.IsEnabled = convertBlocksToItems.IsChecked.GetValueOrDefault();
+            }
         }
     }
 }
