@@ -19,7 +19,7 @@ namespace MacroblockConverter
         {
             InitializeComponent();
             LogMessages = new ObservableCollection<string>();
-            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, DecoCliffCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox};
+            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, DecoCliffCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, preservePenaltySurfaceCheckbox};
             logBox.ItemsSource = LogMessages;
         }
 

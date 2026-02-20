@@ -155,14 +155,14 @@ public class Converter
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
         foreach (var block in blockSpawns)
         {
-            // check if there is a corresponding item, and this block is not placed in freeblock mode (=4)
-            var placementMode = block.Flags >> 24;
+            // check if there is a corresponding item
             if (blockToItem.ContainsKey(block.BlockModel.Id))
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, "DSCukfohR1m0kA6A_8pJ9w");
                 objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
+                var placementMode = block.Flags >> 24;
                 if (placementMode <= 2)  // normal / ghost
                 {
                     var pitch = block.Direction switch
@@ -184,7 +184,6 @@ public class Converter
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Z / 32)
                         );
                     objectSpawn.PitchYawRoll = block.PitchYawRoll;
-
                 }
                 objectSpawn.Scale = 1;
                 objectSpawn.Version = 14;
@@ -244,6 +243,7 @@ public class Converter
             if (isValid)
             {
                 // perform name conversions
+                // TODO maybe don't convert and change surface?
                 if (blockName.StartsWith("DecoPlatformDirt"))
                 {
                     blockName = blockName.Replace("Dirt", "");

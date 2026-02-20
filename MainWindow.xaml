@@ -5,24 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MacroblockConverter"
         mc:Ignorable="d"
-        Title="Macroblock Converter" Height="450" Width="800">
+        ResizeMode="CanMinimize"
+        Title="Macroblock Converter" Height="540" Width="960">
     <Grid>
-        <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_File_Click" Content="Choose file"/>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Macroblock Converter" VerticalAlignment="Top" Height="35" Width="252" FontWeight="Bold" FontSize="24" Margin="0,10,0,0"/>
-        <ListBox x:Name="logBox" Margin="10,233,10,10"/>
-        <CheckBox x:Name="preserveTrimmedCheckbox" Content="Preserve trimmed macroblocks" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="nullifyVariantsCheckbox" Content="Set base variants" HorizontalAlignment="Left" Margin="10,124,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
-        <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="10,143,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="convertBlocksToItems" Content="Convert missing Vista blocks to items" HorizontalAlignment="Center" Margin="0,104,0,0" VerticalAlignment="Top" IsChecked="True" Checked="convertBlocksToItems_Clicked" Unchecked="convertBlocksToItems_Clicked"/>
+        <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_File_Click" Content="Choose file"/>
         <Button x:Name="btnFolderExplorer" HorizontalAlignment="Left" Margin="130,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_Folder_Click" Content="Choose folder"/>
-        <CheckBox x:Name="SnowRoadCheckbox" Content="SnowRoad" HorizontalAlignment="Left" Margin="423,129,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="RallyCastleCheckbox" Content="RallyCastle" HorizontalAlignment="Left" Margin="423,148,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="RallyRoadCheckbox" Content="RallyRoad" HorizontalAlignment="Left" Margin="423,168,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="TrackWallCheckbox" Content="TrackWall" HorizontalAlignment="Left" Margin="332,129,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="DecoWallCheckbox" Content="DecoWall" HorizontalAlignment="Left" Margin="332,148,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="332,168,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="DecoCliffCheckbox" Content="DecoCliff" HorizontalAlignment="Left" Margin="332,188,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <ListBox x:Name="logBox" Margin="10,279,10,10"/>
+        <CheckBox x:Name="preserveTrimmedCheckbox" Content="Preserve trimmed macroblocks" HorizontalAlignment="Left" Margin="21,145,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="nullifyVariantsCheckbox" Content="Set base variants" HorizontalAlignment="Left" Margin="21,165,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
+        <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="21,184,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="convertBlocksToItems" Content="Convert missing Vista blocks to items" HorizontalAlignment="Left" Margin="291,146,0,0" VerticalAlignment="Top" IsChecked="True" Checked="convertBlocksToItems_Clicked" Unchecked="convertBlocksToItems_Clicked"/>
+        <CheckBox x:Name="SnowRoadCheckbox" Content="SnowRoad" HorizontalAlignment="Left" Margin="395,168,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="RallyCastleCheckbox" Content="RallyCastle" HorizontalAlignment="Left" Margin="395,187,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="RallyRoadCheckbox" Content="RallyRoad" HorizontalAlignment="Left" Margin="395,207,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="TrackWallCheckbox" Content="TrackWall" HorizontalAlignment="Left" Margin="304,168,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="DecoWallCheckbox" Content="DecoWall" HorizontalAlignment="Left" Margin="304,187,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="304,207,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="DecoCliffCheckbox" Content="DecoCliff" HorizontalAlignment="Left" Margin="304,227,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <Label Content="General settings" HorizontalAlignment="Left" Margin="17,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Label Content="Item conversion" HorizontalAlignment="Left" Margin="304,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <CheckBox x:Name="preservePenaltySurfaceCheckbox" Content="Preserve penalty surface" HorizontalAlignment="Left" Margin="544,145,0,0" VerticalAlignment="Top" IsChecked="True"/>
 
     </Grid>
 </Window>
