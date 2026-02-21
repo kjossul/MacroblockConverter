@@ -1,31 +1,18 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
-using GBX.NET.Engines.GameData;
 using GBX.NET.LZO;
 using System.IO;
 using System.Text.Json;
 
 public class Converter
 {
-    private readonly List<string> sourceFiles;
-    private readonly bool preserveTrimmed;
-    private readonly bool nullifyVariants;
-    private readonly bool createConvertedFolder;
-    private readonly bool convertBlocksToItems;
-    private readonly Action<string> log;
-    private readonly string[] excludedPrefixes =
-    [
-        "SnowRoad", "RallyCastle", "RallyRoad", "TrackWall", "DecoWall", "StructureStraightInTrackWall", "Canopy",
-        "RoadWater", "PlatformWater", "Water", "Stage", "DecoHill", "DecoCliff", "OpenDirtRoadToRoadIn", "RoadTechToTheme"
+    // blocks that contain these identifiers are filtered out during conversion
+    private readonly string[] banList = [
+        "Snow", "Rally", "Wall", "Canopy", "Water", "Stage", "Hill", "Cliff", "ToTheme", "Roulette",  // stadium
+        "Lake", "River", "Terrain", "Land", "Beach", "Sea", "Shore"  // vistas
     ];
-    private readonly string[] allowedPrefixes =
-    [
-        "DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1"
-    ];
-    private readonly string[] excludedSuffixes =
-    [
-        "TurboRoulette", "ToDecoWall", "ToDecoWallCurve1Out", "ToDecoWallCurve1In", "InTrackWallStraight"
-    ];
+
+    private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1"];
 
     private readonly Dictionary<string, int> environments = new()
     {
@@ -36,19 +23,12 @@ public class Converter
         { "Stadium", 26 }
     };
 
-    public Converter(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, Action<string> log)
+    public Converter()
     {
-        this.sourceFiles = sourceFiles;
-        this.preserveTrimmed = preserveTrimmed;
-        this.nullifyVariants = nullifyVariants;
-        this.createConvertedFolder = createConvertedFolder;
-        this.convertBlocksToItems = convertBlocksToItems;
-        this.log = log;
-
         Gbx.LZO = new Lzo();
     }
 
-    public void Convert()
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, Action<string> log)
     {
         int totalSkipped = 0;
 
@@ -80,7 +60,7 @@ public class Converter
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
                 var sourceEnv = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
-                var validBlocks = CollectValidBlocks(macroBlock);
+                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants);
                 if (convertBlocksToItems) { 
                     macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, blockToItem));
                 }
@@ -162,8 +142,8 @@ public class Converter
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, "DSCukfohR1m0kA6A_8pJ9w");
                 objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
-                var placementMode = block.Flags >> 24;
-                if (placementMode <= 2)  // normal / ghost
+                var placementMode = block.Flags >> 25;
+                if (placementMode <= 1)  // normal / ghost
                 {
                     var pitch = block.Direction switch
                     {
@@ -197,7 +177,7 @@ public class Converter
         return objectSpawns;
     }
 
-    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock)
+    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants)
     {
         var blockSpawns = macroBlock.BlockSpawns;
         var validBlocks = new List<CGameCtnMacroBlockInfo.BlockSpawn>();
@@ -213,29 +193,20 @@ public class Converter
             string blockName = block.BlockModel.Id;
             bool isValid = true;
 
-            foreach (var prefix in excludedPrefixes)
+            foreach (var token in banList)
             {
-                if (blockName.StartsWith(prefix))
+                if (blockName.Contains(token))
                 {
                     isValid = false;
                     break;
                 }
             }
 
-            foreach (var prefix in allowedPrefixes)
+            foreach (var token in whiteList)
             {
-                if (blockName.StartsWith(prefix))
+                if (blockName.Contains(token))
                 {
                     isValid = true;
-                    break;
-                }
-            }
-
-            foreach (var suffix in excludedSuffixes)
-            {
-                if (blockName.EndsWith(suffix))
-                {
-                    isValid = false;
                     break;
                 }
             }

@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace MacroblockConverter
 {
@@ -13,13 +15,14 @@ namespace MacroblockConverter
     {
         private List<string> selectedFiles = new List<string>();
         private List<CheckBox> convertOptions = new List<CheckBox>();
+        private Converter converter = new Converter();
         public ObservableCollection<string> LogMessages { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             LogMessages = new ObservableCollection<string>();
-            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, DecoCliffCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, preservePenaltySurfaceCheckbox};
+            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox};
             logBox.ItemsSource = LogMessages;
         }
 
@@ -83,15 +86,15 @@ namespace MacroblockConverter
         private async void convertButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             convertButton.IsEnabled = false;
-            Converter converter = new Converter(
-                selectedFiles, 
-                preserveTrimmedCheckbox.IsChecked ?? false, 
+            Log("=== Starting Conversion ===");
+            await Task.Run(() => converter.Convert(
+                selectedFiles,
+                preserveTrimmedCheckbox.IsChecked ?? false,
                 nullifyVariantsCheckbox.IsChecked ?? false,
                 createConvertedFolderCheckbox.IsChecked ?? false,
                 convertBlocksToItems.IsChecked ?? false,
-                Log);
-            Log("=== Starting Conversion ===");
-            await Task.Run(() => converter.Convert());
+                Log
+                ));
             convertButton.IsEnabled = true;
             Log("=== Conversion Complete ===");
             Log("Remember to restart your game!");
@@ -103,6 +106,13 @@ namespace MacroblockConverter
             {
                 cb.IsEnabled = convertBlocksToItems.IsChecked.GetValueOrDefault();
             }
+        }
+
+        private void OpenGithub(object sender, RequestNavigateEventArgs e)
+        {
+
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
         }
     }
 }
