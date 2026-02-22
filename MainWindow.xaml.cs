@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Navigation;
 
 namespace MacroblockConverter
@@ -16,6 +18,7 @@ namespace MacroblockConverter
         private List<string> selectedFiles = new List<string>();
         private List<CheckBox> convertOptions = new List<CheckBox>();
         private Converter converter = new Converter();
+        private bool itemsPresent = false;
         public ObservableCollection<string> LogMessages { get; set; }
 
         public MainWindow()
@@ -24,6 +27,7 @@ namespace MacroblockConverter
             LogMessages = new ObservableCollection<string>();
             convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox};
             logBox.ItemsSource = LogMessages;
+            CheckItems();
         }
 
         private void Log(string message)
@@ -39,6 +43,20 @@ namespace MacroblockConverter
             if (logBox.Items.Count > 0)
             {
                 logBox.ScrollIntoView(logBox.Items[logBox.Items.Count - 1]);
+            }
+        }
+
+        private async void CheckItems() {
+            var itemsPresent = await Task.Run(() => converter.CheckItems());
+            if (itemsPresent)
+            {
+                itemsStatusText.Text = "All items found.";
+                itemsStatusText.Foreground = new SolidColorBrush(Colors.Green);
+            } else
+            {
+                itemsStatusText.Text = "Missing items, please use download button.";
+                itemsStatusText.Foreground = new SolidColorBrush(Colors.Red);
+                downloadItemsBtn.IsEnabled = true;
             }
         }
 
@@ -86,6 +104,7 @@ namespace MacroblockConverter
         private async void convertButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             convertButton.IsEnabled = false;
+            Dictionary<string, string> conversions = new();
             Log("=== Starting Conversion ===");
             await Task.Run(() => converter.Convert(
                 selectedFiles,
@@ -93,6 +112,7 @@ namespace MacroblockConverter
                 nullifyVariantsCheckbox.IsChecked ?? false,
                 createConvertedFolderCheckbox.IsChecked ?? false,
                 convertBlocksToItems.IsChecked ?? false,
+                convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList(),
                 Log
                 ));
             convertButton.IsEnabled = true;

@@ -24,7 +24,7 @@
         <CheckBox x:Name="DecoWallCheckbox" Content="DecoWall" HorizontalAlignment="Left" Margin="331,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
         <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="331,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
         <Label Content="General settings" HorizontalAlignment="Left" Margin="17,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
-        <Label Content="Item conversion" HorizontalAlignment="Left" Margin="304,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Label Content="Block to item conversion" HorizontalAlignment="Left" Margin="304,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
         <Rectangle HorizontalAlignment="Left" Height="92" Margin="25,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
@@ -45,8 +45,8 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <Label Content="Github / FAQ" HorizontalAlignment="Left" Margin="587,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
-        <Rectangle HorizontalAlignment="Left" Height="106" Margin="593,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+        <Label Content="Github / FAQ" HorizontalAlignment="Left" Margin="731,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Rectangle HorizontalAlignment="Left" Height="106" Margin="737,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
@@ -57,11 +57,24 @@
             </Rectangle.RenderTransform>
         </Rectangle>
         <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="331,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <TextBlock HorizontalAlignment="Left" Margin="602,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
+        <TextBlock HorizontalAlignment="Left" Margin="746,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
             <Hyperlink NavigateUri="https://github.com/kjossul/MacroblockConverter/" RequestNavigate="OpenGithub">
                 Github
             </Hyperlink>
         </TextBlock>
+        <Label Content="Local items" HorizontalAlignment="Left" Margin="564,144,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Rectangle HorizontalAlignment="Left" Height="74" Margin="577,170,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+            <Rectangle.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Rectangle.RenderTransform>
+        </Rectangle>
+        <Button x:Name="downloadItemsBtn" Content="Download items" HorizontalAlignment="Left" Margin="585,218,0,0" VerticalAlignment="Top" Height="27" Width="147" IsEnabled="False"/>
+        <TextBlock x:Name="itemsStatusText" HorizontalAlignment="Left" Margin="585,174,0,0" TextWrapping="WrapWithOverflow" Text="Checking local items.." VerticalAlignment="Top" Height="39" Width="147"/>
 
     </Grid>
 </Window>

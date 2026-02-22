@@ -1,6 +1,8 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
+using GBX.NET.Engines.GameData;
 using GBX.NET.LZO;
+using System.Formats.Asn1;
 using System.IO;
 using System.Text.Json;
 
@@ -23,17 +25,47 @@ public class Converter
         { "Stadium", 26 }
     };
 
+    private Dictionary<string, Dictionary<string, string>> conversions = new();
+    private Dictionary<string, (string, Vec3)> itemInfo = new();  // (author, pivot)
+
     public Converter()
     {
         Gbx.LZO = new Lzo();
     }
 
-    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, Action<string> log)
+    public bool CheckItems()
+    {
+        var counter = 0;
+        string conversionsFilePath = AppDomain.CurrentDomain.BaseDirectory + @"conversions.json";
+        string baseItemsPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
+            );
+        conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(conversionsFilePath));
+        foreach (var conversion in conversions.Values)
+        {
+            foreach (KeyValuePair<string, string> entry in conversion)
+            {
+                counter++;
+                var itemPath = Path.Combine(baseItemsPath, entry.Value);
+                if (File.Exists(itemPath))
+                {
+                    var item = Gbx.ParseNode<CGameItemModel>(itemPath);
+                    Vec3 pivot = new Vec3();
+                    if (item.DefaultPlacement.PivotPositions.Length > 0)
+                    {
+                        pivot = item.DefaultPlacement.PivotPositions[0] * item.DefaultPlacement.PivotSnapDistance;
+                    }
+                    itemInfo.Add(entry.Key, (item.Ident.Author, pivot));
+                }
+            }
+        }
+        return counter == itemInfo.Count;
+    } 
+
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
     {
         int totalSkipped = 0;
-
-        string blocksListFilePath = AppDomain.CurrentDomain.BaseDirectory + @"conversions.json";
-        Dictionary<string, string> blockToItem = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(blocksListFilePath));
 
         foreach (var sourceFile in sourceFiles)
         {
@@ -62,7 +94,7 @@ public class Converter
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants);
                 if (convertBlocksToItems) { 
-                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, blockToItem));
+                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, convertOptions));
                 }
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
@@ -130,9 +162,13 @@ public class Converter
         log($"Skipped: {totalSkipped}");
     }
 
-    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns, Dictionary<string, string>? blockToItem)
+    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns, List<string> convertOptions)
     {
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
+        Dictionary<string, string> blockToItem = conversions
+            .Where(entry => convertOptions.Contains(entry.Key))
+            .SelectMany(entry => entry.Value)
+            .ToDictionary();
         foreach (var block in blockSpawns)
         {
             // check if there is a corresponding item
@@ -140,8 +176,9 @@ public class Converter
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
-                objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, "DSCukfohR1m0kA6A_8pJ9w");
-                objectSpawn.PivotPosition = new Vec3(-16, 0, -16);
+                (var author, var pivot) = itemInfo[block.BlockModel.Id];
+                objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, author);
+                objectSpawn.PivotPosition = pivot;
                 var placementMode = block.Flags >> 25;
                 if (placementMode <= 1)  // normal / ghost
                 {
