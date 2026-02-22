@@ -47,7 +47,7 @@ namespace MacroblockConverter
         }
 
         private async void CheckItems() {
-            var itemsPresent = await Task.Run(() => converter.CheckItems());
+            itemsPresent = await Task.Run(() => converter.CheckItems());
             if (itemsPresent)
             {
                 itemsStatusText.Text = "All items found.";
@@ -103,18 +103,23 @@ namespace MacroblockConverter
 
         private async void convertButton_ClickAsync(object sender, RoutedEventArgs e)
         {
-            convertButton.IsEnabled = false;
-            Dictionary<string, string> conversions = new();
             Log("=== Starting Conversion ===");
+            convertButton.IsEnabled = false;
+            List<string> opts = convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList();
+            bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
+            bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
+            bool createConverted = createConvertedFolderCheckbox.IsChecked ?? false;
+            bool convertBlocks = convertBlocksToItems.IsChecked ?? false;
+
             await Task.Run(() => converter.Convert(
                 selectedFiles,
-                preserveTrimmedCheckbox.IsChecked ?? false,
-                nullifyVariantsCheckbox.IsChecked ?? false,
-                createConvertedFolderCheckbox.IsChecked ?? false,
-                convertBlocksToItems.IsChecked ?? false,
-                convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList(),
+                preserveTrimmed,
+                nullifyVariants,
+                createConverted,
+                convertBlocks,
+                opts,
                 Log
-                ));
+            ));
             convertButton.IsEnabled = true;
             Log("=== Conversion Complete ===");
             Log("Remember to restart your game!");
