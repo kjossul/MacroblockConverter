@@ -52,6 +52,8 @@ namespace MacroblockConverter
             {
                 itemsStatusText.Text = "All items found.";
                 itemsStatusText.Foreground = new SolidColorBrush(Colors.Green);
+                convertBlocksToItems.IsEnabled = true;
+                convertBlocksToItems_Clicked(null, null);
             } else
             {
                 itemsStatusText.Text = "Missing items, please use download button.";
@@ -109,7 +111,7 @@ namespace MacroblockConverter
             bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
             bool createConverted = createConvertedFolderCheckbox.IsChecked ?? false;
-            bool convertBlocks = convertBlocksToItems.IsChecked ?? false;
+            bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
 
             await Task.Run(() => converter.Convert(
                 selectedFiles,

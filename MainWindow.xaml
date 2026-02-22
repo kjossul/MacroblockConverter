@@ -16,13 +16,13 @@
         <CheckBox x:Name="nullifyVariantsCheckbox" Content="Set base variants" HorizontalAlignment="Left" Margin="33,166,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
         <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="33,187,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="convertBlocksToItems" Content="Convert missing Vista blocks to items" HorizontalAlignment="Left" Margin="318,148,0,0" VerticalAlignment="Top" IsChecked="True" Checked="convertBlocksToItems_Clicked" Unchecked="convertBlocksToItems_Clicked"/>
-        <CheckBox x:Name="SnowRoadCheckbox" Content="SnowRoad" HorizontalAlignment="Left" Margin="422,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="RallyCastleCheckbox" Content="RallyCastle" HorizontalAlignment="Left" Margin="422,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="RallyRoadCheckbox" Content="RallyRoad" HorizontalAlignment="Left" Margin="422,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="TrackWallCheckbox" Content="TrackWall" HorizontalAlignment="Left" Margin="331,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="DecoWallCheckbox" Content="DecoWall" HorizontalAlignment="Left" Margin="331,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
-        <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="331,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="convertBlocksToItems" Content="Convert missing Vista blocks to items" HorizontalAlignment="Left" Margin="318,148,0,0" VerticalAlignment="Top" IsChecked="True" Checked="convertBlocksToItems_Clicked" Unchecked="convertBlocksToItems_Clicked" IsEnabled="False"/>
+        <CheckBox x:Name="SnowRoadCheckbox" Content="SnowRoad" HorizontalAlignment="Left" Margin="422,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="RallyCastleCheckbox" Content="RallyCastle" HorizontalAlignment="Left" Margin="422,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="RallyRoadCheckbox" Content="RallyRoad" HorizontalAlignment="Left" Margin="422,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="TrackWallCheckbox" Content="TrackWall" HorizontalAlignment="Left" Margin="331,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="DecoWallCheckbox" Content="DecoWall" HorizontalAlignment="Left" Margin="331,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="331,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <Label Content="General settings" HorizontalAlignment="Left" Margin="17,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
         <Label Content="Block to item conversion" HorizontalAlignment="Left" Margin="304,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
         <Rectangle HorizontalAlignment="Left" Height="92" Margin="25,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
@@ -56,7 +56,7 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="331,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True"/>
+        <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="331,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <TextBlock HorizontalAlignment="Left" Margin="746,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
             <Hyperlink NavigateUri="https://github.com/kjossul/MacroblockConverter/" RequestNavigate="OpenGithub">
                 Github

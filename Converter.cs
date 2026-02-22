@@ -10,7 +10,7 @@ public class Converter
 {
     // blocks that contain these identifiers are filtered out during conversion
     private readonly string[] banList = [
-        "Snow", "Rally", "Wall", "Canopy", "Water", "Stage", "Hill", "Cliff", "ToTheme", "Roulette",  // stadium
+        "Snow", "Rally", "DecoWall", "TrackWall", "Canopy", "Water", "Stage", "Hill", "Cliff", "ToTheme", "Roulette",  // stadium
         "Lake", "River", "Terrain", "Land", "Beach", "Sea", "Shore"  // vistas
     ];
 
@@ -182,16 +182,20 @@ public class Converter
                 var placementMode = block.Flags >> 25;
                 if (placementMode <= 1)  // normal / ghost
                 {
-                    var pitch = block.Direction switch
+                    (double pitch, Int3 offset) = block.Direction switch
                     {
-                        Direction.North => 0,
-                        Direction.East => -Math.PI / 2,
-                        Direction.South => -Math.PI,
-                        Direction.West => Math.PI / 2,
+                        Direction.North => (0, (0, 0, 0)),
+                        Direction.East => (-Math.PI / 2, (1, 0, 0)),
+                        Direction.South => (-Math.PI, (1, 0, 1)),
+                        Direction.West => (Math.PI / 2, (0, 0, 1))
                     };
+                    if (pivot != (0, 0, 0))  // FIXME maybe we need NPlugItemPlacement_SClass?
+                    {
+                        offset = (0, 0, 0);
+                    }
                     objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
-                    objectSpawn.BlockCoord = block.Coord;
-                    objectSpawn.AbsolutePositionInMap = block.Coord * (32, 8, 32) - objectSpawn.PivotPosition;
+                    objectSpawn.BlockCoord = block.Coord + offset;
+                    objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
                 } else  // freeblock
                 {
                     objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap - objectSpawn.PivotPosition;
