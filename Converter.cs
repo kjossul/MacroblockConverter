@@ -1,6 +1,7 @@
 using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.Engines.GameData;
+using GBX.NET.Engines.Plug;
 using GBX.NET.LZO;
 using System.Formats.Asn1;
 using System.IO;
@@ -14,7 +15,7 @@ public class Converter
         "Lake", "River", "Terrain", "Land", "Beach", "Sea", "Shore"  // vistas
     ];
 
-    private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1"];
+    private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1", "StageTechnicsLight"];
 
     private readonly Dictionary<string, int> environments = new()
     {
@@ -26,7 +27,7 @@ public class Converter
     };
 
     private Dictionary<string, Dictionary<string, string>> conversions = new();
-    private Dictionary<string, (string, Vec3)> itemInfo = new();  // (author, pivot)
+    private Dictionary<string, (string, Vec3, int)> itemInfo = new();  // (author, pivot, size)
 
     public Converter()
     {
@@ -41,10 +42,11 @@ public class Converter
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
             );
+        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill"};
         conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(conversionsFilePath));
-        foreach (var conversion in conversions.Values)
+        foreach (KeyValuePair<string, Dictionary<string, string>> mapping in conversions)
         {
-            foreach (KeyValuePair<string, string> entry in conversion)
+            foreach (KeyValuePair<string, string> entry in mapping.Value)
             {
                 counter++;
                 var itemPath = Path.Combine(baseItemsPath, entry.Value);
@@ -56,7 +58,20 @@ public class Converter
                     {
                         pivot = item.DefaultPlacement.PivotPositions[0] * item.DefaultPlacement.PivotSnapDistance;
                     }
-                    itemInfo.Add(entry.Key, (item.Ident.Author, pivot));
+                    var size = 0;
+                    if (itemsWithOffset.Contains(mapping.Key))
+                    {
+                        // items converted automatically without pivot positions need to be aligned based on their block size
+                        CGameCommonItemEntityModelEdition entityModelEdition = (CGameCommonItemEntityModelEdition)item.EntityModelEdition;
+                        CPlugCrystal.GeometryLayer geometryLayer = (CPlugCrystal.GeometryLayer)entityModelEdition.MeshCrystal.Layers[0];
+                        var meshPositions = geometryLayer.Crystal.Positions;
+                        var minx = meshPositions.Select(v => v.X).Min();
+                        var maxx = meshPositions.Select(v => v.X).Max();
+                        var minz = meshPositions.Select(v => v.Z).Min();
+                        var maxz = meshPositions.Select(v => v.Z).Max();
+                        size = (int)Math.Round(Math.Max((maxx - minx), (maxz - minz)) / 32);
+                    }
+                    itemInfo.Add(entry.Key, (item.Ident.Author, pivot, size));
                 }
             }
         }
@@ -176,7 +191,7 @@ public class Converter
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
                 var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
-                (var author, var pivot) = itemInfo[block.BlockModel.Id];
+                (var author, var pivot, var size) = itemInfo[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, author);
                 objectSpawn.PivotPosition = pivot;
                 var placementMode = block.Flags >> 25;
@@ -189,12 +204,8 @@ public class Converter
                         Direction.South => (-Math.PI, (1, 0, 1)),
                         Direction.West => (Math.PI / 2, (0, 0, 1))
                     };
-                    if (pivot != (0, 0, 0))  // FIXME maybe we need NPlugItemPlacement_SClass?
-                    {
-                        offset = (0, 0, 0);
-                    }
                     objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
-                    objectSpawn.BlockCoord = block.Coord + offset;
+                    objectSpawn.BlockCoord = block.Coord + offset * size;
                     objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
                 } else  // freeblock
                 {
