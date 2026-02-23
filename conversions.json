@@ -400,7 +400,8 @@
     "CanopyEndSlopeBaseCurveIn": "Canopy/CanopyEndSlopeBaseCurveIn.Item.Gbx",
     "CanopyEndSlopeBaseCurveOut": "Canopy/CanopyEndSlopeBaseCurveOut.Item.Gbx",
     "CanopyEndSlopeBaseCurveOutFull": "Canopy/CanopyEndSlopeBaseCurveOutFull.Item.Gbx",
-    "CanopyEndSlopeBaseStraight": "Canopy/CanopyEndSlopeBaseStraight.Item.Gbx"
+    "CanopyEndSlopeBaseStraight": "Canopy/CanopyEndSlopeBaseStraight.Item.Gbx",
+    "CanopyEndSlopeBaseCurveInFull": "Canopy/CanopyEndSlopeBaseCurveInFull.Item.Gbx"
   },
   "HillsShort": {
     "OpenDirtHillsShortBase5": "HillsShort/OpenDirtHillsShortBase5.Item.Gbx",
