@@ -25,7 +25,7 @@ namespace MacroblockConverter
         {
             InitializeComponent();
             LogMessages = [];
-            convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox, CanopyCheckbox, StageCheckbox];
+            convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox];
             logBox.ItemsSource = LogMessages;
             CheckItems();
         }

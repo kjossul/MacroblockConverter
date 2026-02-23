@@ -381,9 +381,44 @@
     "StageSupportCurve3In": "Stage/StageSupportCurve3In.Item.Gbx",
     "StageSupportCurve3Out": "Stage/StageSupportCurve3Out.Item.Gbx",
     "StageSupportDiagIn": "Stage/StageSupportDiagIn.Item.Gbx",
+    "StageSupportDiagOut": "Stage/StageSupportDiagOut.Item.Gbx",
     "StageSupportStraight": "Stage/StageSupportStraight.Item.Gbx",
     "StageSupportTShaped": "Stage/StageSupportTShaped.Item.Gbx",
     "StageTShaped": "Stage/StageTShaped.Item.Gbx"
+  },
+  "Canopy": {
+    "CanopyCenterFlatBase": "Canopy/CanopyCenterFlatBase.Item.Gbx",
+    "CanopyCenterFlatCurveIn": "Canopy/CanopyCenterFlatCurveIn.Item.Gbx",
+    "CanopyCenterFlatCurveOut": "Canopy/CanopyCenterFlatCurveOut.Item.Gbx",
+    "CanopyEndFlatCurveIn": "Canopy/CanopyEndFlatCurveIn.Item.Gbx",
+    "CanopyEndFlatCurveInFull": "Canopy/CanopyEndFlatCurveInFull.Item.Gbx",
+    "CanopyEndFlatCurveOut": "Canopy/CanopyEndFlatCurveOut.Item.Gbx",
+    "CanopyEndFlatCurveOutFull": "Canopy/CanopyEndFlatCurveOutFull.Item.Gbx",
+    "CanopyEndFlatDiagIn": "Canopy/CanopyEndFlatDiagIn.Item.Gbx",
+    "CanopyEndFlatDiagOut": "Canopy/CanopyEndFlatDiagOut.Item.Gbx",
+    "CanopyEndFlatStraight": "Canopy/CanopyEndFlatStraight.Item.Gbx",
+    "CanopyEndSlopeBaseCurveIn": "Canopy/CanopyEndSlopeBaseCurveIn.Item.Gbx",
+    "CanopyEndSlopeBaseCurveOut": "Canopy/CanopyEndSlopeBaseCurveOut.Item.Gbx",
+    "CanopyEndSlopeBaseCurveOutFull": "Canopy/CanopyEndSlopeBaseCurveOutFull.Item.Gbx",
+    "CanopyEndSlopeBaseStraight": "Canopy/CanopyEndSlopeBaseStraight.Item.Gbx"
+  },
+  "HillsShort": {
+    "OpenDirtHillsShortBase5": "HillsShort/OpenDirtHillsShortBase5.Item.Gbx",
+    "OpenDirtHillsShortCurve1In": "HillsShort/OpenDirtHillsShortCurve1In.Item.Gbx",
+    "OpenDirtHillsShortCurve1Out": "HillsShort/OpenDirtHillsShortCurve1Out.Item.Gbx",
+    "OpenDirtHillsShortStraight": "HillsShort/OpenDirtHillsShortStraight.Item.Gbx",
+    "OpenGrassHillsShortBase5": "HillsShort/OpenGrassHillsShortBase5.Item.Gbx",
+    "OpenGrassHillsShortCurve1In": "HillsShort/OpenGrassHillsShortCurve1In.Item.Gbx",
+    "OpenGrassHillsShortCurve1Out": "HillsShort/OpenGrassHillsShortCurve1Out.Item.Gbx",
+    "OpenGrassHillsShortStraight": "HillsShort/OpenGrassHillsShortStraight.Item.Gbx",
+    "OpenIceHillsShortBase5": "HillsShort/OpenIceHillsShortBase5.Item.Gbx",
+    "OpenIceHillsShortCurve1In": "HillsShort/OpenIceHillsShortCurve1In.Item.Gbx",
+    "OpenIceHillsShortCurve1Out": "HillsShort/OpenIceHillsShortCurve1Out.Item.Gbx",
+    "OpenIceHillsShortStraight": "HillsShort/OpenIceHillsShortStraight.Item.Gbx",
+    "OpenTechHillsShortBase5": "HillsShort/OpenTechHillsShortBase5.Item.Gbx",
+    "OpenTechHillsShortCurve1In": "HillsShort/OpenTechHillsShortCurve1In.Item.Gbx",
+    "OpenTechHillsShortCurve1Out": "HillsShort/OpenTechHillsShortCurve1Out.Item.Gbx",
+    "OpenTechHillsShortStraight": "HillsShort/OpenTechHillsShortStraight.Item.Gbx"
   }
 }
 
