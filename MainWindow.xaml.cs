@@ -76,7 +76,7 @@ namespace MacroblockConverter
             {
                 selectedFiles.AddRange(ofd.FileNames);
                 convertButton.IsEnabled = true;
-                Log($"Selected {selectedFiles.Count} macroblock(s).");
+                foreach (var name in ofd.FileNames) { Log($"Selected {name}."); }                
             }
             else
             {
@@ -110,6 +110,7 @@ namespace MacroblockConverter
             List<string> opts = convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList();
             bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
+            bool convertGroundGhost = groundGhostCheckbox.IsChecked ?? false;
             bool createConverted = createConvertedFolderCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
 
@@ -117,6 +118,7 @@ namespace MacroblockConverter
                 selectedFiles,
                 preserveTrimmed,
                 nullifyVariants,
+                convertGroundGhost,
                 createConverted,
                 convertBlocks,
                 opts,

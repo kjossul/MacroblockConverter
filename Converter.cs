@@ -78,7 +78,8 @@ public class Converter
         return counter == itemInfo.Count;
     } 
 
-    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool createConvertedFolder, bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGroundGhost, bool createConvertedFolder, 
+        bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
     {
         int totalSkipped = 0;
 
@@ -107,7 +108,7 @@ public class Converter
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
                 var sourceEnv = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
-                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants);
+                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGroundGhost);
                 if (convertBlocksToItems) { 
                     macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, convertOptions));
                 }
@@ -194,8 +195,8 @@ public class Converter
                 (var author, var pivot, var size) = itemInfo[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, author);
                 objectSpawn.PivotPosition = pivot;
-                var placementMode = block.Flags >> 25;
-                if (placementMode <= 1)  // normal / ghost
+                var placementMode = block.Flags >> 24;
+                if (placementMode < 4)  // normal / ground / air / ground ghost
                 {
                     (double pitch, Int3 offset) = block.Direction switch
                     {
@@ -229,7 +230,7 @@ public class Converter
         return objectSpawns;
     }
 
-    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants)
+    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants, bool convertGroundGhost)
     {
         var blockSpawns = macroBlock.BlockSpawns;
         var validBlocks = new List<CGameCtnMacroBlockInfo.BlockSpawn>();
@@ -279,6 +280,10 @@ public class Converter
                 if (nullifyVariants)
                 {
                     block.Flags = (int)((uint)block.Flags & 0xFF000000u);  // preserve only placement mode
+                }
+                if (convertGroundGhost && (block.Flags >> 24 == 1))
+                {
+                    block.Flags = (2 << 24) + block.Flags & 0x00FFFFFF;  // convert ground mode to air mode
                 }
                 validBlocks.Add(block);
             }
