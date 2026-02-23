@@ -78,8 +78,8 @@
         <CheckBox x:Name="convertGroundCheckbox" Content="Convert Ground mode to Air" HorizontalAlignment="Left" Margin="33,186,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="CanopyCheckbox" Content="Canopy" HorizontalAlignment="Left" Margin="423,249,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <CheckBox x:Name="StageCheckbox" Content="Stage" HorizontalAlignment="Left" Margin="331,249,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
-        <CheckBox x:Name="ignoreVistaVegetationCheckbox" Content="Ignore Vista vegetation" HorizontalAlignment="Left" Margin="33,205,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <CheckBox x:Name="OverrideVistaDecoWallCheckbox" Content="Override Vista DecoWall" HorizontalAlignment="Left" Margin="321,272,0,0" VerticalAlignment="Top" IsChecked="False" IsEnabled="False"/>
+        <CheckBox x:Name="ignoreVegetationCheckbox" Content="Ignore vegetation" HorizontalAlignment="Left" Margin="33,205,0,0" VerticalAlignment="Top" IsChecked="False"/>
+        <CheckBox x:Name="OverrideVistaDecoWallCheckbox" Content="Override Vista DecoWall" HorizontalAlignment="Left" Margin="331,269,0,0" VerticalAlignment="Top" IsChecked="False" IsEnabled="False"/>
         <Label Content="Target" HorizontalAlignment="Left" Margin="724,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
         <Label Content="Convert to:" HorizontalAlignment="Left" Margin="740,140,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="StadiumCheckbox" Content="Stadium" HorizontalAlignment="Left" Margin="745,167,0,0" VerticalAlignment="Top" IsChecked="True"/>

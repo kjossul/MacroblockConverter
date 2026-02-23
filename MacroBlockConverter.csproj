@@ -11,10 +11,14 @@
 
   <ItemGroup>
     <None Remove="conversions.json" />
+    <None Remove="vegetation.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="conversions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="vegetation.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

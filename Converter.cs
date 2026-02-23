@@ -6,6 +6,7 @@ using GBX.NET.LZO;
 using System.Formats.Asn1;
 using System.IO;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 public class Converter
 {
@@ -26,24 +27,28 @@ public class Converter
         { "Stadium", 26 }
     };
 
-    private Dictionary<string, Dictionary<string, string>> conversions = new();
-    private Dictionary<string, (string, Vec3, int)> itemInfo = new();  // (author, pivot, size)
+    private Dictionary<string, Dictionary<string, string>> conversions = [];
+    private readonly Dictionary<string, (string, Vec3, int)> itemInfo = [];  // (author, pivot, size)
+    private Dictionary<string, string> blockToItem = [];  // mapping between block identifier and item filepath
+    private readonly HashSet<string> vegetation = [];  // set of identifiers of vegetation items in vistas
+    private readonly Regex terrainRegex = new(@"On(Water|Dirt|Lake|Grass|Land|Beach|Sea).*$", RegexOptions.Compiled);  // regex for replacing road/platform on terrain with regular blocks
 
     public Converter()
     {
         Gbx.LZO = new Lzo();
+        vegetation = JsonSerializer.Deserialize<HashSet<string>>(File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"vegetation.json"));
+        conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"conversions.json"));
     }
 
     public bool CheckItems()
     {
         var counter = 0;
-        string conversionsFilePath = AppDomain.CurrentDomain.BaseDirectory + @"conversions.json";
         string baseItemsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
             );
-        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill"};
-        conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(conversionsFilePath));
+        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill", "Stage", "Canopy", "HillsShort"};
+        
         foreach (KeyValuePair<string, Dictionary<string, string>> mapping in conversions)
         {
             foreach (KeyValuePair<string, string> entry in mapping.Value)
@@ -78,10 +83,14 @@ public class Converter
         return counter == itemInfo.Count;
     } 
 
-    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGroundGhost, bool createConvertedFolder, 
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGroundGhost, bool ignoreVegetation, bool createConvertedFolder, 
         bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
     {
         int totalSkipped = 0;
+        blockToItem = conversions
+            .Where(entry => convertOptions.Contains(entry.Key))
+            .SelectMany(entry => entry.Value)
+            .ToDictionary();
 
         foreach (var sourceFile in sourceFiles)
         {
@@ -110,7 +119,7 @@ public class Converter
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGroundGhost);
                 if (convertBlocksToItems) { 
-                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns, convertOptions));
+                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns));
                 }
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
@@ -157,6 +166,23 @@ public class Converter
                             block.BlockModel.Author
                         );
                     }
+                    foreach (var objectSpawn in macroBlock.ObjectSpawns)
+                    {
+                        var ident = objectSpawn.ItemModel;
+                        // replace ident of nando items so that they can be selected in the editor, except for vegetation (might not be shared)
+                        if (ident.Author == "Nadeo" && !vegetation.Contains(ident.Id))
+                        {
+                            objectSpawn.ItemModel = new Ident(ident.Id, collectionId, ident.Author);
+                        }
+                    }
+                    if (ignoreVegetation)
+                    {
+                        macroBlock.ObjectSpawns.RemoveAll(objectSpawn => {
+                            var ident = objectSpawn.ItemModel;
+                            return ident.Author == "Nadeo" && vegetation.Contains(ident.Id);
+                        });
+                    }
+
                     macroBlock.Ident = new Ident(
                         macroBlock.Ident.Id,
                         collectionId,
@@ -178,13 +204,9 @@ public class Converter
         log($"Skipped: {totalSkipped}");
     }
 
-    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns, List<string> convertOptions)
+    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
     {
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
-        Dictionary<string, string> blockToItem = conversions
-            .Where(entry => convertOptions.Contains(entry.Key))
-            .SelectMany(entry => entry.Value)
-            .ToDictionary();
         foreach (var block in blockSpawns)
         {
             // check if there is a corresponding item
@@ -196,7 +218,7 @@ public class Converter
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, author);
                 objectSpawn.PivotPosition = pivot;
                 var placementMode = block.Flags >> 24;
-                if (placementMode < 4)  // normal / ground / air / ground ghost
+                if (placementMode < 4)  // 0 = normal / 1 = ground / 2 = air / 3 = ground ghost
                 {
                     (double pitch, Int3 offset) = block.Direction switch
                     {
@@ -208,7 +230,7 @@ public class Converter
                     objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
                     objectSpawn.BlockCoord = block.Coord + offset * size;
                     objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
-                } else  // freeblock
+                } else  // 4 = air ghost (freeblock)
                 {
                     objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap - objectSpawn.PivotPosition;
                     objectSpawn.BlockCoord = new Int3(
@@ -244,6 +266,7 @@ public class Converter
                 continue;
 
             string blockName = block.BlockModel.Id;
+            blockName = terrainRegex.Replace(blockName, string.Empty);
             bool isValid = true;
 
             foreach (var token in banList)

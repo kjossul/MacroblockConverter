@@ -15,9 +15,9 @@ namespace MacroblockConverter
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<string> selectedFiles = new List<string>();
-        private List<CheckBox> convertOptions = new List<CheckBox>();
-        private Converter converter = new Converter();
+        private List<string> selectedFiles = [];
+        private List<CheckBox> convertOptions = [];
+        private readonly Converter converter;
         private bool itemsPresent = false;
         public ObservableCollection<string> LogMessages { get; set; }
 
@@ -25,8 +25,10 @@ namespace MacroblockConverter
         {
             InitializeComponent();
             LogMessages = [];
-            convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox];
+            convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, 
+                TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox, OverrideVistaDecoWallCheckbox];
             logBox.ItemsSource = LogMessages;
+            converter = new Converter();
             CheckItems();
         }
 
@@ -39,7 +41,6 @@ namespace MacroblockConverter
             }
             LogMessages.Add($"[{DateTime.Now:HH:mm:ss}] {message}");
 
-            // Auto-scroll to the bottom
             if (logBox.Items.Count > 0)
             {
                 logBox.ScrollIntoView(logBox.Items[logBox.Items.Count - 1]);
@@ -107,11 +108,12 @@ namespace MacroblockConverter
         {
             Log("=== Starting Conversion ===");
             convertButton.IsEnabled = false;
-            List<string> opts = convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList();
+            List<string> convertOptions = [.. this.convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select<CheckBox, string>(checkBox => checkBox.Content.ToString())];
             bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
             bool convertGroundGhost = convertGroundCheckbox.IsChecked ?? false;
-            bool createConverted = createConvertedFolderCheckbox.IsChecked ?? false;
+            bool ignoreVegetation = ignoreVegetationCheckbox.IsChecked ?? false;
+            bool createConvertedFolder = createConvertedFolderCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
 
             await Task.Run(() => converter.Convert(
@@ -119,9 +121,10 @@ namespace MacroblockConverter
                 preserveTrimmed,
                 nullifyVariants,
                 convertGroundGhost,
-                createConverted,
+                ignoreVegetation,
+                createConvertedFolder,
                 convertBlocks,
-                opts,
+                convertOptions,
                 Log
             ));
             convertButton.IsEnabled = true;
