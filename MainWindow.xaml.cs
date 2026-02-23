@@ -24,8 +24,8 @@ namespace MacroblockConverter
         public MainWindow()
         {
             InitializeComponent();
-            LogMessages = new ObservableCollection<string>();
-            convertOptions = new List<CheckBox> { TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox};
+            LogMessages = [];
+            convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, TransitionsCheckbox, CanopyCheckbox, StageCheckbox];
             logBox.ItemsSource = LogMessages;
             CheckItems();
         }
@@ -110,7 +110,7 @@ namespace MacroblockConverter
             List<string> opts = convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select(checkBox => checkBox.Content.ToString()).ToList();
             bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
-            bool convertGroundGhost = groundGhostCheckbox.IsChecked ?? false;
+            bool convertGroundGhost = convertGroundCheckbox.IsChecked ?? false;
             bool createConverted = createConvertedFolderCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
 
@@ -139,7 +139,6 @@ namespace MacroblockConverter
 
         private void OpenGithub(object sender, RequestNavigateEventArgs e)
         {
-
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             e.Handled = true;
         }

@@ -9,13 +9,13 @@
         Title="Macroblock Converter" Height="540" Width="960">
     <Grid>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Macroblock Converter" VerticalAlignment="Top" Height="35" Width="252" FontWeight="Bold" FontSize="24" Margin="0,10,0,0"/>
-        <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_File_Click" Content="Choose file"/>
-        <Button x:Name="btnFolderExplorer" HorizontalAlignment="Left" Margin="130,74,0,0" VerticalAlignment="Top" Height="25" Width="115" Click="Button_Folder_Click" Content="Choose folder"/>
-        <ListBox x:Name="logBox" Margin="10,279,10,10"/>
+        <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Height="25" Width="143" Click="Button_File_Click" Content="Choose file"/>
+        <Button x:Name="btnFolderExplorer" HorizontalAlignment="Left" Margin="158,74,0,0" VerticalAlignment="Top" Height="25" Width="147" Click="Button_Folder_Click" Content="Choose folder"/>
+        <ListBox x:Name="logBox" Margin="10,311,10,10"/>
         <CheckBox x:Name="preserveTrimmedCheckbox" Content="Preserve trimmed macroblocks" HorizontalAlignment="Left" Margin="33,146,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="nullifyVariantsCheckbox" Content="Set base variants" HorizontalAlignment="Left" Margin="33,166,0,0" VerticalAlignment="Top" IsChecked="True"/>
-        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="25" Width="115" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync"/>
-        <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="33,206,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Button x:Name="convertButton" Content="Convert" HorizontalAlignment="Left" Margin="10,269,0,0" VerticalAlignment="Top" Height="37" Width="295" FontWeight="Bold" IsEnabled="False" Click="convertButton_ClickAsync" FontSize="14"/>
+        <CheckBox x:Name="createConvertedFolderCheckbox" Content="Create 'Converted' Folder" HorizontalAlignment="Left" Margin="33,245,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="convertBlocksToItems" Content="Convert missing Vista blocks to items" HorizontalAlignment="Left" Margin="318,148,0,0" VerticalAlignment="Top" IsChecked="True" Checked="convertBlocksToItems_Clicked" Unchecked="convertBlocksToItems_Clicked" IsEnabled="False"/>
         <CheckBox x:Name="SnowRoadCheckbox" Content="SnowRoad" HorizontalAlignment="Left" Margin="422,170,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <CheckBox x:Name="RallyCastleCheckbox" Content="RallyCastle" HorizontalAlignment="Left" Margin="422,189,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
@@ -25,7 +25,7 @@
         <CheckBox x:Name="DecoHillCheckbox" Content="DecoHill" HorizontalAlignment="Left" Margin="331,209,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <Label Content="General settings" HorizontalAlignment="Left" Margin="17,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
         <Label Content="Block to item conversion" HorizontalAlignment="Left" Margin="304,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
-        <Rectangle HorizontalAlignment="Left" Height="92" Margin="25,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+        <Rectangle HorizontalAlignment="Left" Height="126" Margin="25,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
@@ -35,7 +35,7 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <Rectangle HorizontalAlignment="Left" Height="106" Margin="310,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+        <Rectangle HorizontalAlignment="Left" Height="168" Margin="310,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
@@ -45,8 +45,8 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <Label Content="Github / FAQ" HorizontalAlignment="Left" Margin="731,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
-        <Rectangle HorizontalAlignment="Left" Height="106" Margin="737,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+        <Label Content="Github / FAQ" HorizontalAlignment="Left" Margin="724,27,0,0" VerticalAlignment="Top" Foreground="#B2000000" RenderTransformOrigin="0.19,0.464"/>
+        <Rectangle HorizontalAlignment="Left" Height="168" Margin="737,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
@@ -56,14 +56,14 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="331,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
-        <TextBlock HorizontalAlignment="Left" Margin="746,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
+        <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="423,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <TextBlock HorizontalAlignment="Left" Margin="745,53,0,0" TextWrapping="Wrap" VerticalAlignment="Top">
             <Hyperlink NavigateUri="https://github.com/kjossul/MacroblockConverter/" RequestNavigate="OpenGithub">
                 Github
             </Hyperlink>
         </TextBlock>
-        <Label Content="Local items" HorizontalAlignment="Left" Margin="564,144,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
-        <Rectangle HorizontalAlignment="Left" Height="74" Margin="577,170,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+        <Label Content="Local items" HorizontalAlignment="Left" Margin="565,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Rectangle HorizontalAlignment="Left" Height="168" Margin="577,138,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
             <Rectangle.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="-1"/>
@@ -73,9 +73,31 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <Button x:Name="downloadItemsBtn" Content="Download items" HorizontalAlignment="Left" Margin="585,218,0,0" VerticalAlignment="Top" Height="27" Width="147" IsEnabled="False"/>
-        <TextBlock x:Name="itemsStatusText" HorizontalAlignment="Left" Margin="585,174,0,0" TextWrapping="WrapWithOverflow" Text="Checking local items.." VerticalAlignment="Top" Height="39" Width="147"/>
-        <CheckBox x:Name="groundGhostCheckbox" Content="Convert Ground mode to Air" HorizontalAlignment="Left" Margin="33,186,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Button x:Name="downloadItemsBtn" Content="Download items" HorizontalAlignment="Left" Margin="585,197,0,0" VerticalAlignment="Top" Height="27" Width="147" IsEnabled="False"/>
+        <TextBlock x:Name="itemsStatusText" HorizontalAlignment="Left" Margin="585,146,0,0" TextWrapping="WrapWithOverflow" Text="Checking local items.." VerticalAlignment="Top" Height="39" Width="147"/>
+        <CheckBox x:Name="convertGroundCheckbox" Content="Convert Ground mode to Air" HorizontalAlignment="Left" Margin="33,186,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="CanopyCheckbox" Content="Canopy" HorizontalAlignment="Left" Margin="331,229,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="StageCheckbox" Content="Stage" HorizontalAlignment="Left" Margin="331,249,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
+        <CheckBox x:Name="ignoreVistaVegetationCheckbox" Content="Ignore Vista vegetation" HorizontalAlignment="Left" Margin="33,205,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="simplifyOnTerrain" Content="Simplify 'OnTerrain' blocks" HorizontalAlignment="Left" Margin="33,225,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Label Content="Target" HorizontalAlignment="Left" Margin="724,112,0,0" VerticalAlignment="Top" Foreground="#B2000000"/>
+        <Label Content="Convert to:" HorizontalAlignment="Left" Margin="740,140,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="stadiumCheckbox" Content="Stadium" HorizontalAlignment="Left" Margin="745,167,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="redIslandCheckbox" Content="RedIsland" HorizontalAlignment="Left" Margin="745,188,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="blueBayCheckbox" Content="BlueBay" HorizontalAlignment="Left" Margin="745,208,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="greenCoastCheckbox" Content="GreenCoast" HorizontalAlignment="Left" Margin="838,168,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <CheckBox x:Name="whiteShoreCheckbox" Content="WhiteShore" HorizontalAlignment="Left" Margin="838,188,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Label Content="Note: source collection is skipped &#xD;&#xA;automatically, no need to uncheck it." HorizontalAlignment="Left" Margin="745,227,0,0" VerticalAlignment="Top" Foreground="#B2000000" Height="44"/>
+        <Rectangle HorizontalAlignment="Left" Height="58" Margin="737,53,0,0" VerticalAlignment="Top" Width="3" Fill="#33000000" RenderTransformOrigin="0.5,0.5">
+            <Rectangle.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Rectangle.RenderTransform>
+        </Rectangle>
 
     </Grid>
 </Window>
