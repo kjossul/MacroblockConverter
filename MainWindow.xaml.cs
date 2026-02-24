@@ -113,7 +113,6 @@ namespace MacroblockConverter
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
             bool convertGround = convertGroundCheckbox.IsChecked ?? false;
             bool ignoreVegetation = ignoreVegetationCheckbox.IsChecked ?? false;
-            bool createConvertedFolder = createConvertedFolderCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
 
             await Task.Run(() => converter.Convert(
@@ -122,7 +121,6 @@ namespace MacroblockConverter
                 nullifyVariants,
                 convertGround,
                 ignoreVegetation,
-                createConvertedFolder,
                 convertBlocks,
                 convertOptions,
                 Log

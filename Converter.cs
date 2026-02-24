@@ -18,7 +18,7 @@ public class Converter
 
     private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1", "StageTechnicsLight"];
 
-    private readonly Dictionary<string, int> environments = new()
+    private readonly Dictionary<string, int> collections = new()
     {
         { "BlueBay", 28 },
         { "GreenCoast", 15 },
@@ -85,7 +85,7 @@ public class Converter
         return counter == itemInfo.Count;
     } 
 
-    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGround, bool ignoreVegetation, bool createConvertedFolder, 
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGround, bool ignoreVegetation,
         bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
     {
         int totalSkipped = 0;
@@ -105,7 +105,7 @@ public class Converter
                 if (parts[i].Equals("Blocks", StringComparison.OrdinalIgnoreCase))
                 {
                     baseBlocksPath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Take(i + 1));
-                    relativePath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(i + 2));
+                    relativePath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(i + 1));
                     break;
                 }
             }
@@ -117,7 +117,7 @@ public class Converter
             try
             {
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
-                var sourceEnv = macroBlock.Ident.Collection.Number;
+                var sourceCollection = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround);
                 if (convertBlocksToItems) { 
@@ -137,12 +137,12 @@ public class Converter
                     totalSkipped++;
                     continue;
                 }
-                foreach (var env in environments)
+                foreach (var collection in collections)
                 {
-                    string envName = env.Key;
-                    int collectionId = env.Value;
-                    if (sourceEnv == collectionId) { continue; }  // don't convert to the same environment
-                    string destFolder = Path.Combine(baseBlocksPath, envName, createConvertedFolder ? "Converted" : "");
+                    string collectionName = collection.Key;
+                    int collectionId = collection.Value;
+                    if (sourceCollection == collectionId) { continue; }  // don't convert to the same environment
+                    string destFolder = Path.Combine(baseBlocksPath, collectionName);
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
 
