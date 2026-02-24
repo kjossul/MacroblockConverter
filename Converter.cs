@@ -28,10 +28,10 @@ public class Converter
     };
 
     private Dictionary<string, Dictionary<string, string>> conversions = [];
-    private readonly Dictionary<string, (string, Vec3, int)> itemInfo = [];  // (author, pivot, size)
+    private readonly Dictionary<string, (string, Vec3, Int3)> itemInfo = [];  // (author, pivot, size)
     private Dictionary<string, string> blockToItem = [];  // mapping between block identifier and item filepath
     private readonly HashSet<string> vegetation = [];  // set of identifiers of vegetation items in vistas
-    private readonly Regex terrainRegex = new(@"On(Water|Dirt|Lake|Grass|Land|Beach|Sea).*$", RegexOptions.Compiled);  // regex for replacing road/platform on terrain with regular blocks
+    private readonly Regex terrainRegex = new(@"On(?:Water|Dirt|Lake|Grass|Land|Beach|SeaCliff).*?(?=\d|$)(\d*)", RegexOptions.Compiled);  // regex for replacing road/platform on terrain with regular blocks
 
     public Converter()
     {
@@ -63,7 +63,7 @@ public class Converter
                     {
                         pivot = item.DefaultPlacement.PivotPositions[0] * item.DefaultPlacement.PivotSnapDistance;
                     }
-                    var size = 0;
+                    var size = (0, 0, 0);
                     if (itemsWithOffset.Contains(mapping.Key))
                     {
                         // items converted automatically without pivot positions need to be aligned based on their block size
@@ -74,7 +74,9 @@ public class Converter
                         var maxx = meshPositions.Select(v => v.X).Max();
                         var minz = meshPositions.Select(v => v.Z).Min();
                         var maxz = meshPositions.Select(v => v.Z).Max();
-                        size = (int)Math.Round(Math.Max((maxx - minx), (maxz - minz)) / 32);
+                        size = ((int)Math.Round((maxx - minx) / 32),
+                                0,
+                                (int)Math.Round((maxz - minz) / 32)); 
                     }
                     itemInfo.Add(entry.Key, (item.Ident.Author, pivot, size));
                 }
@@ -83,7 +85,7 @@ public class Converter
         return counter == itemInfo.Count;
     } 
 
-    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGroundGhost, bool ignoreVegetation, bool createConvertedFolder, 
+    public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGround, bool ignoreVegetation, bool createConvertedFolder, 
         bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
     {
         int totalSkipped = 0;
@@ -117,7 +119,7 @@ public class Converter
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
                 var sourceEnv = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
-                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGroundGhost);
+                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround);
                 if (convertBlocksToItems) { 
                     macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns));
                 }
@@ -223,12 +225,12 @@ public class Converter
                     (double pitch, Int3 offset) = block.Direction switch
                     {
                         Direction.North => (0, (0, 0, 0)),
-                        Direction.East => (-Math.PI / 2, (1, 0, 0)),
-                        Direction.South => (-Math.PI, (1, 0, 1)),
-                        Direction.West => (Math.PI / 2, (0, 0, 1))
+                        Direction.East => (-Math.PI / 2, new Int3(1, 0, 0) * size.Z),
+                        Direction.South => (-Math.PI, new Int3(1, 0, 1) * size),
+                        Direction.West => (Math.PI / 2, new Int3(0, 0, 1) * size.X)
                     };
                     objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
-                    objectSpawn.BlockCoord = block.Coord + offset * size;
+                    objectSpawn.BlockCoord = block.Coord + offset;
                     objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
                 } else  // 4 = air ghost (freeblock)
                 {
@@ -252,7 +254,7 @@ public class Converter
         return objectSpawns;
     }
 
-    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants, bool convertGroundGhost)
+    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants, bool convertGround)
     {
         var blockSpawns = macroBlock.BlockSpawns;
         var validBlocks = new List<CGameCtnMacroBlockInfo.BlockSpawn>();
@@ -266,7 +268,49 @@ public class Converter
                 continue;
 
             string blockName = block.BlockModel.Id;
-            blockName = terrainRegex.Replace(blockName, string.Empty);
+            var placementMode = block.Flags >> 24;
+            // replace blocks on terrain with normal blocks
+            var match = terrainRegex.Match(blockName);
+            if (match.Success)
+            {
+                blockName = blockName.Replace(match.ToString(), string.Empty);
+                if (blockName.Contains("Slope")) // slopes don't need y fixing
+                {
+                    if (blockName.Contains("SlopeBase"))  // these are mirrored
+                    {
+                        if (placementMode < 4)
+                        {
+                            block.Direction = block.Direction switch
+                            {
+                                Direction.North => Direction.South,
+                                Direction.East => Direction.West,
+                                Direction.South => Direction.North,
+                                Direction.West => Direction.East,
+                            };
+                        }
+                        else 
+                        {
+                            (var pitch, var yaw, var roll) = block.PitchYawRoll;
+                            block.PitchYawRoll = new Vec3(-pitch, yaw >= 0 ? yaw - (float)Math.PI : yaw + (float)Math.PI, -roll);
+                        }
+                    }
+                    if (blockName.Contains("Platform")) // only platform has different slope2 names
+                    {
+                        blockName = blockName.Replace("SlopeBase2", "Slope2Base");
+                    }
+                } else
+                {
+                    if (placementMode == 4) continue;  // TODO implement correct transformation for freeblocked "OnTerrain" blocks
+                    if (blockName.Contains("Diag"))
+                    {
+                        blockName += "X2";
+                    }
+                    // add terrain height to the block y coordinate
+                    int blockHeight = !string.IsNullOrEmpty(match.Groups[1].Value) ? int.Parse(match.Groups[1].Value) : 1;
+                    block.Coord = new Int3(block.Coord.X, block.Coord.Y + blockHeight, block.Coord.Z);
+                }
+            }
+
             bool isValid = true;
 
             foreach (var token in banList)
@@ -302,11 +346,11 @@ public class Converter
                 block.BlockModel = new Ident(blockName, block.BlockModel.Collection, block.BlockModel.Author);
                 if (nullifyVariants)
                 {
-                    block.Flags = (int)((uint)block.Flags & 0xFF000000u);  // preserve only placement mode
+                    block.Flags = block.Flags & 0xF000000;  // preserve only placement mode
                 }
-                if (convertGroundGhost && (block.Flags >> 24 == 1))
+                if (convertGround && ( placementMode == 1 || placementMode == 3))
                 {
-                    block.Flags = (2 << 24) + block.Flags & 0x00FFFFFF;  // convert ground mode to air mode
+                    block.Flags = (2 << 24) + block.Flags & 0x0FFFFFF;  // convert ground / ground ghost mode to air mode
                 }
                 validBlocks.Add(block);
             }

@@ -111,7 +111,7 @@ namespace MacroblockConverter
             List<string> convertOptions = [.. this.convertOptions.Where(checkBox => checkBox.IsChecked.Value).Select<CheckBox, string>(checkBox => checkBox.Content.ToString())];
             bool preserveTrimmed = preserveTrimmedCheckbox.IsChecked ?? false;
             bool nullifyVariants = nullifyVariantsCheckbox.IsChecked ?? false;
-            bool convertGroundGhost = convertGroundCheckbox.IsChecked ?? false;
+            bool convertGround = convertGroundCheckbox.IsChecked ?? false;
             bool ignoreVegetation = ignoreVegetationCheckbox.IsChecked ?? false;
             bool createConvertedFolder = createConvertedFolderCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
@@ -120,7 +120,7 @@ namespace MacroblockConverter
                 selectedFiles,
                 preserveTrimmed,
                 nullifyVariants,
-                convertGroundGhost,
+                convertGround,
                 ignoreVegetation,
                 createConvertedFolder,
                 convertBlocks,
