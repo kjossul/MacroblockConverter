@@ -71,7 +71,7 @@
                 </TransformGroup>
             </Rectangle.RenderTransform>
         </Rectangle>
-        <Button x:Name="downloadItemsBtn" Content="Download items" HorizontalAlignment="Left" Margin="579,147,0,0" VerticalAlignment="Top" Height="27" Width="147" IsEnabled="False"/>
+        <Button x:Name="downloadItemsBtn" Content="Download items" HorizontalAlignment="Left" Margin="579,147,0,0" VerticalAlignment="Top" Height="27" Width="147" IsEnabled="False" Click="downloadItemsBtn_ClickAsync"/>
         <TextBlock x:Name="itemsStatusText" HorizontalAlignment="Left" Margin="579,95,0,0" TextWrapping="WrapWithOverflow" Text="Checking local items.." VerticalAlignment="Top" Height="39" Width="147"/>
         <CheckBox x:Name="convertGroundCheckbox" Content="Convert Ground mode to Air" HorizontalAlignment="Left" Margin="24,137,0,0" VerticalAlignment="Top" IsChecked="True"/>
         <CheckBox x:Name="CanopyCheckbox" Content="Canopy" HorizontalAlignment="Left" Margin="423,198,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>

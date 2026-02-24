@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -59,7 +61,7 @@ namespace MacroblockConverter
                 convertBlocksToItems_Clicked(null, null);
             } else
             {
-                Log("Missing items! Converting might not work correctly!");
+                Log("Missing items! Please use the download button if you want to convert block into items.");
                 itemsStatusText.Text = "Missing items, please use download button.";
                 itemsStatusText.Foreground = new SolidColorBrush(Colors.Red);
                 downloadItemsBtn.IsEnabled = true;
@@ -148,6 +150,25 @@ namespace MacroblockConverter
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             e.Handled = true;
+        }
+
+        private async void downloadItemsBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            Log("Downloading items.");
+            downloadItemsBtn.IsEnabled = false;
+            string url = "https://github.com/kjossul/MacroblockConverter/raw/refs/heads/main/items.zip";
+            string destinationPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
+            );
+            await Task.Run(async () => {
+                HttpClient client = new();
+                Stream zipStream = await client.GetStreamAsync(url);
+                ZipArchive archive = new(zipStream);
+                archive.ExtractToDirectory(destinationPath, overwriteFiles: true);
+            });
+            Log($"Downloaded and extracted items to {destinationPath}");
+            CheckItems();
         }
     }
 }

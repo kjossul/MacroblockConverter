@@ -40,14 +40,14 @@ public class Converter
         conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"conversions.json"));
     }
 
-    public bool CheckItems(Action<string> log)
+    public bool CheckItems(Action<string> Log)
     {
+        Log("Checking local items...");
         var counter = 0;
         string baseItemsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
             );
-        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill", "Stage", "Canopy", "HillsShort", "Override Vista DecoWall" };
         
         foreach (KeyValuePair<string, Dictionary<string, string>> mapping in conversions)
         {
@@ -59,12 +59,11 @@ public class Converter
                 {
                     var item = Gbx.ParseNode<CGameItemModel>(itemPath);
                     Vec3 pivot = new Vec3();
+                    var size = (0, 0, 0);
                     if (item.DefaultPlacement.PivotPositions.Length > 0)
                     {
                         pivot = item.DefaultPlacement.PivotPositions[0] * item.DefaultPlacement.PivotSnapDistance;
-                    }
-                    var size = (0, 0, 0);
-                    if (itemsWithOffset.Contains(mapping.Key))
+                    } else
                     {
                         // items converted automatically without pivot positions need to be aligned based on their block size
                         CGameCommonItemEntityModelEdition entityModelEdition = (CGameCommonItemEntityModelEdition)item.EntityModelEdition;
@@ -76,12 +75,9 @@ public class Converter
                         var maxz = meshPositions.Select(v => v.Z).Max();
                         size = ((int)Math.Round((maxx - minx) / 32),
                                 0,
-                                (int)Math.Round((maxz - minz) / 32)); 
+                                (int)Math.Round((maxz - minz) / 32));
                     }
-                    itemInfo.Add(entry.Key, (item.Ident.Author, pivot, size));
-                } else
-                {
-                    log($"Could not find {itemPath}");
+                    itemInfo[entry.Key] = (item.Ident.Author, pivot, size);
                 }
             }
         }
