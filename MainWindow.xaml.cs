@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +16,7 @@ namespace MacroblockConverter
     {
         private List<string> selectedFiles = [];
         private List<CheckBox> convertOptions = [];
+        private List<CheckBox> targets = [];
         private readonly Converter converter;
         private bool itemsPresent = false;
         public ObservableCollection<string> LogMessages { get; set; }
@@ -27,6 +27,7 @@ namespace MacroblockConverter
             LogMessages = [];
             convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, 
                 TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox, OverrideVistaDecoWallCheckbox];
+            targets = [StadiumCheckbox, RedIslandCheckbox, GreenCoastCheckbox, BlueBayCheckbox, WhiteShoreCheckbox];
             logBox.ItemsSource = LogMessages;
             converter = new Converter();
             CheckItems();
@@ -48,15 +49,17 @@ namespace MacroblockConverter
         }
 
         private async void CheckItems() {
-            itemsPresent = await Task.Run(() => converter.CheckItems());
+            itemsPresent = await Task.Run(() => converter.CheckItems(Log));
             if (itemsPresent)
             {
+                Log("All converter items loaded correctly.");
                 itemsStatusText.Text = "All items found.";
                 itemsStatusText.Foreground = new SolidColorBrush(Colors.Green);
                 convertBlocksToItems.IsEnabled = true;
                 convertBlocksToItems_Clicked(null, null);
             } else
             {
+                Log("Missing items! Converting might not work correctly!");
                 itemsStatusText.Text = "Missing items, please use download button.";
                 itemsStatusText.Foreground = new SolidColorBrush(Colors.Red);
                 downloadItemsBtn.IsEnabled = true;
@@ -114,6 +117,7 @@ namespace MacroblockConverter
             bool convertGround = convertGroundCheckbox.IsChecked ?? false;
             bool ignoreVegetation = ignoreVegetationCheckbox.IsChecked ?? false;
             bool convertBlocks = convertBlocksToItems.IsEnabled && (convertBlocksToItems.IsChecked ?? false);
+            HashSet<string> targets = [.. this.targets.Where(checkBox => checkBox.IsChecked.Value).Select<CheckBox, string>(checkBox => checkBox.Content.ToString())];
 
             await Task.Run(() => converter.Convert(
                 selectedFiles,
@@ -123,11 +127,13 @@ namespace MacroblockConverter
                 ignoreVegetation,
                 convertBlocks,
                 convertOptions,
+                targets,
                 Log
             ));
             convertButton.IsEnabled = true;
             Log("=== Conversion Complete ===");
-            Log("Remember to restart your game!");
+            if (!nullifyVariants) Log("!!Warning!! Performed conversion without setting base block variants, this might result in editor crashes!");
+            Log("If the Macroblocks aren't showing, restart your game!");
         }
 
         private void convertBlocksToItems_Clicked(object sender, RoutedEventArgs e)

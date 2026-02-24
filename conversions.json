@@ -420,6 +420,16 @@
     "OpenTechHillsShortCurve1In": "HillsShort/OpenTechHillsShortCurve1In.Item.Gbx",
     "OpenTechHillsShortCurve1Out": "HillsShort/OpenTechHillsShortCurve1Out.Item.Gbx",
     "OpenTechHillsShortStraight": "HillsShort/OpenTechHillsShortStraight.Item.Gbx"
+  },
+  "Override Vista DecoWall": {
+    "DecoWallBase": "Walls/DecoWall/DecoWallBase.Item.Gbx",
+    "PlatformBase": "Walls/DecoWall/PlatformBase.Item.Gbx",
+    "DecoWallSlope2Straight": "Walls/DecoWall/DecoWallSlope2Straight.Item.Gbx",
+    "DecoWallDiag1": "Walls/DecoWall/DecoWallDiag1.Item.Gbx",
+    "DecoWallDiag1Slope2DownLeft": "Walls/DecoWall/DecoWallDiag1Slope2DownLeft.Item.Gbx",
+    "DecoWallDiag1Slope2DownRight": "Walls/DecoWall/DecoWallDiag1Slope2DownRight.Item.Gbx",
+    "DecoWallDiag1Slope2UpLeft": "Walls/DecoWall/DecoWallDiag1Slope2UpLeft.Item.Gbx",
+    "DecoWallDiag1Slope2UpRight": "Walls/DecoWall/DecoWallDiag1Slope2UpRight.Item.Gbx"
   }
 }
 

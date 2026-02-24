@@ -16,7 +16,7 @@ public class Converter
         "Lake", "River", "Terrain", "Land", "Beach", "Sea", "Shore"  // vistas
     ];
 
-    private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1", "StageTechnicsLight"];
+    private readonly string[] whiteList = ["DecoWallBase", "DecoWallSlope2Straight", "DecoWallDiag1", "StageTechnicsLight", "GameplayRally", "GameplaySnow"];
 
     private readonly Dictionary<string, int> collections = new()
     {
@@ -40,14 +40,14 @@ public class Converter
         conversions = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"conversions.json"));
     }
 
-    public bool CheckItems()
+    public bool CheckItems(Action<string> log)
     {
         var counter = 0;
         string baseItemsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
             );
-        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill", "Stage", "Canopy", "HillsShort"};
+        string[] itemsWithOffset = {"TrackWall", "DecoWall", "DecoHill", "Stage", "Canopy", "HillsShort", "Override Vista DecoWall" };
         
         foreach (KeyValuePair<string, Dictionary<string, string>> mapping in conversions)
         {
@@ -79,6 +79,9 @@ public class Converter
                                 (int)Math.Round((maxz - minz) / 32)); 
                     }
                     itemInfo.Add(entry.Key, (item.Ident.Author, pivot, size));
+                } else
+                {
+                    log($"Could not find {itemPath}");
                 }
             }
         }
@@ -86,7 +89,7 @@ public class Converter
     } 
 
     public void Convert(List<string> sourceFiles, bool preserveTrimmed, bool nullifyVariants, bool convertGround, bool ignoreVegetation,
-        bool convertBlocksToItems, List<string> convertOptions, Action<string> log)
+        bool convertBlocksToItems, List<string> convertOptions, HashSet<string> targets, Action<string> log)
     {
         int totalSkipped = 0;
         blockToItem = conversions
@@ -119,7 +122,7 @@ public class Converter
                 var macroBlock = Gbx.ParseNode<CGameCtnMacroBlockInfo>(sourceFile);
                 var sourceCollection = macroBlock.Ident.Collection.Number;
                 macroBlock.AutoTerrains = [];
-                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround);
+                var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround, convertOptions.Contains("Override Vista DecoWall"));
                 if (convertBlocksToItems) { 
                     macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns));
                 }
@@ -141,7 +144,8 @@ public class Converter
                 {
                     string collectionName = collection.Key;
                     int collectionId = collection.Value;
-                    if (sourceCollection == collectionId) { continue; }  // don't convert to the same environment
+                    if (!targets.Contains(collectionName)) { continue; }  // skip if user specified to not convert to this collection
+                    if (sourceCollection == collectionId) { continue; }  // don't convert to the same collection
                     string destFolder = Path.Combine(baseBlocksPath, collectionName);
                     string destPath = Path.Combine(destFolder, relativePath);
                     string destDirectory = Path.GetDirectoryName(destPath);
@@ -254,7 +258,7 @@ public class Converter
         return objectSpawns;
     }
 
-    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants, bool convertGround)
+    private List<CGameCtnMacroBlockInfo.BlockSpawn> CollectValidBlocks(CGameCtnMacroBlockInfo macroBlock, bool nullifyVariants, bool convertGround, bool skipVistaDecoWall)
     {
         var blockSpawns = macroBlock.BlockSpawns;
         var validBlocks = new List<CGameCtnMacroBlockInfo.BlockSpawn>();
@@ -268,6 +272,8 @@ public class Converter
                 continue;
 
             string blockName = block.BlockModel.Id;
+            if (skipVistaDecoWall && conversions["Override Vista DecoWall"].ContainsKey(blockName))
+                continue;
             var placementMode = block.Flags >> 24;
             // replace blocks on terrain with normal blocks
             var match = terrainRegex.Match(blockName);
@@ -306,7 +312,7 @@ public class Converter
                         blockName += "X2";
                     }
                     // add terrain height to the block y coordinate
-                    int blockHeight = !string.IsNullOrEmpty(match.Groups[1].Value) ? int.Parse(match.Groups[1].Value) : 1;
+                    int blockHeight = !string.IsNullOrEmpty(match.Groups[1].Value) ? int.Parse(match.Groups[1].Value) : 1;  // if there's no number in string, offset is 1
                     block.Coord = new Int3(block.Coord.X, block.Coord.Y + blockHeight, block.Coord.Z);
                 }
             }
