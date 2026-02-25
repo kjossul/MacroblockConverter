@@ -242,20 +242,12 @@ public class Converter
 
                     Quaternion rotation;
                     Vector3 rotatedPivot;
-                    if (MathF.Abs(MathF.Abs(pitch) - MathF.PI / 2) < 0.01)  // handle gimbal lock
+                    if (MathF.Abs(MathF.Abs(pitch) - MathF.PI / 2) < 0.01)
                     {
-                        // todo rewrite by rotating around unitZ this is ugly
-                        if (pitch > 0)
-                        {
-                            rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw - roll);
-                            rotatedPivot = Vector3.Transform(new Vector3(pivot.Y, pivot.X, pivot.Z), rotation);
-                            objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (rotatedPivot.Y, -rotatedPivot.X, -rotatedPivot.Z);
-                        }
-                        else {
-                            rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, - yaw - roll);
-                            rotatedPivot = Vector3.Transform(new Vector3(pivot.Y, pivot.X, pivot.Z), rotation);
-                            objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (-rotatedPivot.Y, -rotatedPivot.X, rotatedPivot.Z);
-                        }
+                        rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch > 0 ? -(yaw - roll) : (yaw + roll));
+                        rotatedPivot = Vector3.Transform(pivot, rotation);
+                        objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + 
+                            (pitch > 0 ? (rotatedPivot.X, -rotatedPivot.Y, -rotatedPivot.Z) : (-rotatedPivot.X, -rotatedPivot.Y, rotatedPivot.Z));
                     }
                     else
                     {
