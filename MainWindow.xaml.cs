@@ -72,7 +72,7 @@ namespace MacroblockConverter
         { 
             OpenFileDialog ofd = new OpenFileDialog();
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string defaultPath = Path.Combine(documentsPath, @"Trackmania\Blocks\Stadium\");
+            string defaultPath = Path.Combine(documentsPath, @"Trackmania\Blocks\");
             ofd.InitialDirectory = Directory.Exists(defaultPath) ? defaultPath : documentsPath;
             ofd.Multiselect = true;
             ofd.Filter = "Macroblocks|*.Macroblock.Gbx";
@@ -94,15 +94,18 @@ namespace MacroblockConverter
         {
             OpenFolderDialog ofd = new OpenFolderDialog();
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string defaultPath = Path.Combine(documentsPath, @"Trackmania\Blocks\Stadium\");
+            string defaultPath = Path.Combine(documentsPath, @"Trackmania\Blocks\");
             ofd.InitialDirectory = Directory.Exists(defaultPath) ? defaultPath : documentsPath;
             ofd.ShowDialog();
             LogMessages.Clear();
             selectedFiles.Clear();
             foreach (string folder in ofd.FolderNames) 
             {
-                Log($"Parsing {folder}");
-                var files = Directory.GetFiles(folder, "*.Macroblock.Gbx", SearchOption.AllDirectories);
+                Log($"Parsing {folder} (excluding previously converted macroblocks).");
+                var files = Directory.GetFiles(folder, "*.Macroblock.Gbx", SearchOption.AllDirectories)
+                            .Where(f => !new[] { "StadiumConverted", "RedIslandConverted", "BlueBayConverted", "GreenCoastConverted", "WhiteShoreConverted" }
+                            .Any(excluded => f.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                            .Contains(excluded)));
                 selectedFiles.AddRange(files);
                 Log($"Found {selectedFiles.Count} macroblocks.");
             }

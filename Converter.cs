@@ -32,6 +32,8 @@ public class Converter
     private Dictionary<string, string> blockToItem = [];  // mapping between block identifier and item filepath
     private readonly HashSet<string> vegetation = [];  // set of identifiers of vegetation items in vistas
     private readonly Regex terrainRegex = new(@"On(?:Water|Dirt|Lake|Grass|Land|Beach|SeaCliff).*?(?=\d|$)(\d*)", RegexOptions.Compiled);  // regex for replacing road/platform on terrain with regular blocks
+    private readonly HashSet<string> safeVariants = ["StructureSupport", "StageTechnicsLight"];  // blocks that are safe to fully convert variants of TODO INCOMPLETE ?
+    private readonly List<string> altCars = ["Snow", "Rally", "Desert"];
 
     public Converter()
     {
@@ -104,7 +106,9 @@ public class Converter
                 if (parts[i].Equals("Blocks", StringComparison.OrdinalIgnoreCase))
                 {
                     baseBlocksPath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Take(i + 1));
-                    relativePath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(i + 1));
+                    var relativeParts = parts.Skip(i + 1).ToList();
+                    relativeParts[0] += @"Converted";
+                    relativePath = string.Join(Path.DirectorySeparatorChar.ToString(), relativeParts);
                     break;
                 }
             }
@@ -120,7 +124,7 @@ public class Converter
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround, convertOptions.Contains("Override Vista DecoWall"));
                 if (convertBlocksToItems) { 
-                    macroBlock.ObjectSpawns.AddRange(CollectConvertibleBlocks(macroBlock.BlockSpawns));
+                    macroBlock.ObjectSpawns.AddRange(ConvertBlocksToItems(macroBlock.BlockSpawns));
                 }
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
@@ -171,8 +175,8 @@ public class Converter
                     foreach (var objectSpawn in macroBlock.ObjectSpawns)
                     {
                         var ident = objectSpawn.ItemModel;
-                        // replace ident of nando items so that they can be selected in the editor, except for vegetation (might not be shared)
-                        if (ident.Author == "Nadeo" && !vegetation.Contains(ident.Id))
+                        // replace ident of nando items so that they can be selected in the editor, except for vegetation (might not be shared) and alt cars items
+                        if (ident.Author == "Nadeo" && !vegetation.Contains(ident.Id) && altCars.All(s => !ident.Id.StartsWith(s)))
                         {
                             objectSpawn.ItemModel = new Ident(ident.Id, collectionId, ident.Author);
                         }
@@ -206,7 +210,7 @@ public class Converter
         log($"Skipped: {totalSkipped}");
     }
 
-    private List<CGameCtnMacroBlockInfo.ObjectSpawn> CollectConvertibleBlocks(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
+    private List<CGameCtnMacroBlockInfo.ObjectSpawn> ConvertBlocksToItems(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
     {
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
         foreach (var block in blockSpawns)
@@ -226,8 +230,8 @@ public class Converter
                     {
                         Direction.North => (0, (0, 0, 0)),
                         Direction.East => (-Math.PI / 2, new Int3(1, 0, 0) * size.Z),
-                        Direction.South => (-Math.PI, new Int3(1, 0, 1) * size),
-                        Direction.West => (Math.PI / 2, new Int3(0, 0, 1) * size.X)
+                        Direction.South => (-Math.PI, new Int3(1, 0, 1) * size.Z),
+                        Direction.West => (Math.PI / 2, new Int3(0, 0, 1) * size.Z)
                     };
                     objectSpawn.PitchYawRoll = new Vec3((float)pitch, 0, 0);
                     objectSpawn.BlockCoord = block.Coord + offset;
@@ -346,7 +350,7 @@ public class Converter
                     blockName = blockName.Replace("Ice", "");
                 }
                 block.BlockModel = new Ident(blockName, block.BlockModel.Collection, block.BlockModel.Author);
-                if (nullifyVariants)
+                if (nullifyVariants && safeVariants.All(s => !blockName.Contains(s)))
                 {
                     block.Flags = block.Flags & 0xF000000;  // preserve only placement mode
                 }
