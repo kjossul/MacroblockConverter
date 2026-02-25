@@ -3,8 +3,8 @@ using GBX.NET.Engines.Game;
 using GBX.NET.Engines.GameData;
 using GBX.NET.Engines.Plug;
 using GBX.NET.LZO;
-using System.Formats.Asn1;
 using System.IO;
+using System.Numerics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -124,7 +124,7 @@ public class Converter
                 macroBlock.AutoTerrains = [];
                 var validBlocks = CollectValidBlocks(macroBlock, nullifyVariants, convertGround, convertOptions.Contains("Override Vista DecoWall"));
                 if (convertBlocksToItems) { 
-                    macroBlock.ObjectSpawns.AddRange(ConvertBlocksToItems(macroBlock.BlockSpawns));
+                    macroBlock.ObjectSpawns.AddRange(ConvertBlocksToItems(macroBlock.BlockSpawns, log));
                 }
 
                 if (validBlocks.Count == 0 && macroBlock.ObjectSpawns.Count == 0)
@@ -210,7 +210,7 @@ public class Converter
         log($"Skipped: {totalSkipped}");
     }
 
-    private List<CGameCtnMacroBlockInfo.ObjectSpawn> ConvertBlocksToItems(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns)
+    private List<CGameCtnMacroBlockInfo.ObjectSpawn> ConvertBlocksToItems(List<CGameCtnMacroBlockInfo.BlockSpawn> blockSpawns, Action<string> Log)
     {
         var objectSpawns = new List<CGameCtnMacroBlockInfo.ObjectSpawn>();
         foreach (var block in blockSpawns)
@@ -238,13 +238,38 @@ public class Converter
                     objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
                 } else  // 4 = air ghost (freeblock)
                 {
-                    objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap - objectSpawn.PivotPosition;
+                    (var pitch, var yaw, var roll) = block.PitchYawRoll;
+
+                    Quaternion rotation;
+                    Vector3 rotatedPivot;
+                    if (MathF.Abs(MathF.Abs(pitch) - MathF.PI / 2) < 0.01)  // handle gimbal lock
+                    {
+                        // todo rewrite by rotating around unitZ this is ugly
+                        if (pitch > 0)
+                        {
+                            rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw - roll);
+                            rotatedPivot = Vector3.Transform(new Vector3(pivot.Y, pivot.X, pivot.Z), rotation);
+                            objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (rotatedPivot.Y, -rotatedPivot.X, -rotatedPivot.Z);
+                        }
+                        else {
+                            rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, - yaw - roll);
+                            rotatedPivot = Vector3.Transform(new Vector3(pivot.Y, pivot.X, pivot.Z), rotation);
+                            objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (-rotatedPivot.Y, -rotatedPivot.X, rotatedPivot.Z);
+                        }
+                    }
+                    else
+                    {
+                        rotation = Quaternion.CreateFromYawPitchRoll(pitch, yaw, roll);
+                        rotatedPivot = Vector3.Transform(pivot * -1, rotation);
+                        objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (rotatedPivot.X, rotatedPivot.Y, rotatedPivot.Z);
+                    }
                     objectSpawn.BlockCoord = new Int3(
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.X / 32),
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Y / 8),
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Z / 32)
                         );
                     objectSpawn.PitchYawRoll = block.PitchYawRoll;
+                    // Log($"{block.BlockModel.Id} ({block.PitchYawRoll}): {block.AbsolutePositionInMap} + {rotatedPivot} = {objectSpawn.AbsolutePositionInMap}");
                 }
                 objectSpawn.Scale = 1;
                 objectSpawn.Version = 14;
