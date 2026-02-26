@@ -77,10 +77,6 @@ public class Converter
                                 (int)Math.Round((maxz - minz) / 32));
                     }
                     itemInfo[entry.Key] = (item.Ident.Author, pivot, size);
-                } else
-                {
-                    Log(itemPath);
-
                 }
             }
         }
