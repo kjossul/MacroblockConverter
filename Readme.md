@@ -72,7 +72,7 @@ with
 "SnowRoadStraight": "a-jRoad/Roadwood/9_RoadWoodFlat/9_RoadWoodFlatMain/9_RoadWoodStraight.Item.Gbx",
 ```
 
-You can either modify the `SnowRoad` section directly, or add this line into the `Custom` section instead. If you decide for the second option, make sure to convert with `SnowRoad` unchecked to avoid duplicates.
+You can either modify the `SnowRoad` section directly, or add this line into the `Custom` section instead. If you decide for the second option, make sure to convert with `SnowRoad` unchecked to make sure the conversion works properly.
 
 ## Contributing and Future Updates
 
