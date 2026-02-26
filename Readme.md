@@ -1,13 +1,13 @@
 # MacroBlock Converter
 
-This app allows you to convert macroblocks between the five TM2020 collections (Stadium, Red Island, Green Coast, Blue Bay, White Shore).
+A [GBX.NET](https://github.com/BigBang1112/gbx-net) app that allows you to convert macroblocks between the five TM2020 collections (Stadium, Red Island, Green Coast, Blue Bay, White Shore).
 
 ![Demo](Screenshots/demo.png)
 ![Screenshot](Screenshots/gui.png)
 
 ## Install guide
 
-Go to Releases, download the zip file, extract it and run the executable.
+Go to [Releases](https://github.com/kjossul/MacroblockConverter/releases/latest), download the zip file, extract it and run the executable.
 
 ## Usage
 
@@ -37,20 +37,57 @@ To reduce the amount of embedded items, the program allows you to pick and choos
 | DecoWall | MeshModeller | [Link](https://github.com/RuurdBijlsma/tm-convert-blocks-to-items/releases/tag/07-04-22) |
 | DecoHill | MeshModeller | [Link](https://github.com/RuurdBijlsma/tm-convert-blocks-to-items/releases/tag/07-04-22) |
 | HillsShort | MeshModeller | [Link](https://github.com/RuurdBijlsma/tm-convert-blocks-to-items/releases/tag/07-04-22). Some textures are weird. |
-| SnowRoad | [Vista Wood by Yin_TM](https://item.exchange/set/view/13284) |  |
+| SnowRoad | [Vista Wood by Yin_TM](https://item.exchange/set/view/13284) | AKA wood |
 | RallyCastle | [Vista Castle by Yin_TM](https://item.exchange/set/view/13285) | Clips need to be placed manually |
 | RallyRoad | [Vista Rally by Yin_TM](https://item.exchange/set/view/13297) | Clips need to be placed manually |
 | Transitions | [Vista Transitions by Yin_TM](https://item.exchange/set/view/13290) | Road/Platform to TrackWall/DecoWall |
 | Stage | MeshModeller | Manually made by me |
 | Canopy | MeshModeller | Manually made by me |
-## For developers
 
-I'm not an experienced C# dev, nor GBX expert. Any PR is welcome, as I'm probably missing many details.
+There is an additional option called `Override Vista DecoWall`. Vistas have a limited amount of blocks with the same shape of `DecoWall`, namely:
+```
+DecoWallBase
+PlatformBase
+DecoWallSlope2Straight
+DecoWallDiag1
+DecoWallDiag1Slope2DownLeft
+DecoWallDiag1Slope2DownRight
+DecoWallDiag1Slope2UpLeft
+DecoWallDiag1Slope2UpRight
+```
+However, this blocks have different textures in Stadium. For this reason, you might want to have the specified option checked, so that your Stadium macroblocks will come with the same textures.
+### Custom conversions
 
-The current implementation simply checks for allowed suffixes/prefixes in the block name, and replaces the `Ident` field in the macroblock and on each block with the correct one for each vista. Furthermore, it clears the `AutoTerrain` array, as in my experience it caused crashing.
+Many of these items have a huge size. This means that, for instance, converting a full wood route will likely result in exceeding the allowed embedded items size.
+
+My main use case for this application was converting scenery macroblocks (like the amazing [modular scenery](https://item.exchange/set/view/12042) and its [expansion](https://item.exchange/set/view/12798)), so I don't have need to convert more than a couple of items per map. 
+However, if you find yourself short of embedded items size, you can instruct the program to convert to smaller items by modifying `conversions.json` with the specified item.
+
+For example, assuming you have the same file structure in [TrackmaniaItemsSorted](https://github.com/ski-freak/TrackmaniaItemsSorted), you could replace this line in the json file
+```
+"SnowRoadStraight": "0-B-NoUpload/MacroblockConverter/wood/1/STRT.Item.Gbx",
+```
+with
+```
+"SnowRoadStraight": "a-jRoad/Roadwood/9_RoadWoodFlat/9_RoadWoodFlatMain/9_RoadWoodStraight.Item.Gbx",
+```
+
+You can either modify the `SnowRoad` section directly, or add this line into the `Custom` section instead. If you decide for the second option, make sure to convert with `SnowRoad` unchecked to avoid duplicates.
+
+## Contributing and Future Updates
+
+I'm not an experienced C# dev, so any PR is welcome! Here are some things that I plan to implement eventually:
+
+- **Storing user preferences** on file so the gui preserves states between sections.
+- **Handle terrain**: theoretically, we should be able to convert terrain between the 4 Vistas.
+- **Preserving penalty surface**: Vistas only have one penalty surface in their blockset. Currently, the app simply removes the penalty type during conversion. This means that macroblocks with penalty grass, sand and snow in Stadium would all be converted into sand blocks in Red Island, for instance. An option to preserve penalty surface through custom items would be highly useful!
+- **DecoWallSlope2Straight insertions**: there are some blocks, like `DecoHill`, that contain wood pillars in some variants, which are lost during conversion. It would be useful to insert the Slope2 block present in the vista beneath them to preserve scenery. 
+- **Code documentation**
+
+
 
 ## Thanks to
 
 Special thanks to:
-- BigBang1112 for the amazing work on [GBX.NET](https://github.com/BigBang1112/gbx-net)
+- BigBang1112 for the amazing work on [GBX.NET](https://github.com/BigBang1112/gbx-net).
 - Zai for letting me know about the issue with block variants and giving me tips.
