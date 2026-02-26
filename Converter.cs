@@ -238,30 +238,19 @@ public class Converter
                     objectSpawn.AbsolutePositionInMap = objectSpawn.BlockCoord * (32, 8, 32) - objectSpawn.PivotPosition;
                 } else  // 4 = air ghost (freeblock)
                 {
-                    (var pitch, var yaw, var roll) = block.PitchYawRoll;
-
-                    Quaternion rotation;
-                    Vector3 rotatedPivot;
-                    if (MathF.Abs(MathF.Abs(pitch) - MathF.PI / 2) < 0.01)
-                    {
-                        rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch > 0 ? -(yaw - roll) : (yaw + roll));
-                        rotatedPivot = Vector3.Transform(pivot, rotation);
-                        objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + 
-                            (pitch > 0 ? (rotatedPivot.X, -rotatedPivot.Y, -rotatedPivot.Z) : (-rotatedPivot.X, -rotatedPivot.Y, rotatedPivot.Z));
-                    }
-                    else
-                    {
-                        rotation = Quaternion.CreateFromYawPitchRoll(pitch, yaw, roll);
-                        rotatedPivot = Vector3.Transform(pivot * -1, rotation);
-                        objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (rotatedPivot.X, rotatedPivot.Y, rotatedPivot.Z);
-                    }
+                    // not sure why we need to invert the block PYR and then remap the outputs, I used a script that permutates through all possible rotations to find the correct one.
+                    (var pitch, var yaw, var roll) = -block.PitchYawRoll;
+                    Vector3 offset = Vector3.Negate(pivot);
+                    Quaternion rotation = Quaternion.CreateFromYawPitchRoll(pitch, roll, yaw);
+                    Vector3 rotatedOffset = Vector3.Transform(offset, rotation);
+                    objectSpawn.AbsolutePositionInMap = block.AbsolutePositionInMap + (rotatedOffset.Z, rotatedOffset.Y, rotatedOffset.X);
                     objectSpawn.BlockCoord = new Int3(
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.X / 32),
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Y / 8),
                         (int)Math.Floor((double)objectSpawn.AbsolutePositionInMap.Z / 32)
                         );
                     objectSpawn.PitchYawRoll = block.PitchYawRoll;
-                    // Log($"{block.BlockModel.Id} ({block.PitchYawRoll}): {block.AbsolutePositionInMap} + {rotatedPivot} = {objectSpawn.AbsolutePositionInMap}");
+                    //Log($"{block.BlockModel.Id} ({block.PitchYawRoll}): {block.AbsolutePositionInMap} + {rotatedOffset} = {objectSpawn.AbsolutePositionInMap}");
                 }
                 objectSpawn.Scale = 1;
                 objectSpawn.Version = 14;

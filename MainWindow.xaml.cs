@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -173,5 +174,11 @@ namespace MacroblockConverter
             Log($"Downloaded and extracted items to {destinationPath}");
             CheckItems();
         }
+
+        private void logbox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Clipboard.SetDataObject(this.logBox.SelectedItem.ToString());
+        }
+
     }
 }
