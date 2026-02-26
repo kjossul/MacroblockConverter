@@ -55,7 +55,7 @@ DecoWallDiag1Slope2DownRight
 DecoWallDiag1Slope2UpLeft
 DecoWallDiag1Slope2UpRight
 ```
-However, this blocks have different textures in Stadium. For this reason, you might want to have the specified option checked, so that your Stadium macroblocks will come with the same textures.
+However, these blocks have different textures in Stadium. For this reason, you might want to have the specified option checked, so that your Stadium macroblocks will come with the same textures.
 ### Custom conversions
 
 Many of these items have a huge size. This means that, for instance, converting a full wood route will likely result in exceeding the allowed embedded items size.
