@@ -29,7 +29,7 @@ namespace MacroblockConverter
             InitializeComponent();
             LogMessages = [];
             convertOptions = [TrackWallCheckbox, DecoWallCheckbox, DecoHillCheckbox, SnowRoadCheckbox, RallyCastleCheckbox, RallyRoadCheckbox, 
-                TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox, OverrideVistaDecoWallCheckbox];
+                TransitionsCheckbox, CanopyCheckbox, StageCheckbox, HillsShortCheckbox, OverrideVistaDecoWallCheckbox, CustomCheckbox];
             targets = [StadiumCheckbox, RedIslandCheckbox, GreenCoastCheckbox, BlueBayCheckbox, WhiteShoreCheckbox];
             logBox.ItemsSource = LogMessages;
             converter = new Converter();
@@ -102,7 +102,7 @@ namespace MacroblockConverter
             selectedFiles.Clear();
             foreach (string folder in ofd.FolderNames) 
             {
-                Log($"Parsing {folder} (excluding previously converted macroblocks).");
+                Log($"Searching {folder} (excluding previously converted macroblocks).");
                 var files = Directory.GetFiles(folder, "*.Macroblock.Gbx", SearchOption.AllDirectories)
                             .Where(f => !new[] { "StadiumConverted", "RedIslandConverted", "BlueBayConverted", "GreenCoastConverted", "WhiteShoreConverted" }
                             .Any(excluded => f.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
@@ -139,6 +139,7 @@ namespace MacroblockConverter
             convertButton.IsEnabled = true;
             Log("=== Conversion Complete ===");
             if (!nullifyVariants) Log("!!Warning!! Performed conversion without setting base block variants, this might result in editor crashes!");
+            if (!convertGround) Log("!!Warning!! Performed conversion without converting ground to air, macroblocks might not be able to be placed!");
             Log("If the Macroblocks aren't showing, restart your game!");
         }
 
@@ -158,7 +159,7 @@ namespace MacroblockConverter
 
         private async void downloadItemsBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
-            Log("Downloading items.");
+            Log("Downloading items. Please be patient..");
             downloadItemsBtn.IsEnabled = false;
             string url = "https://github.com/kjossul/MacroblockConverter/raw/refs/heads/main/items.zip";
             string destinationPath = Path.Combine(
@@ -169,15 +170,15 @@ namespace MacroblockConverter
                 HttpClient client = new();
                 Stream zipStream = await client.GetStreamAsync(url);
                 ZipArchive archive = new(zipStream);
-                archive.ExtractToDirectory(destinationPath, overwriteFiles: true);
+                archive.ExtractToDirectory(destinationPath, overwriteFiles: false);
             });
             Log($"Downloaded and extracted items to {destinationPath}");
             CheckItems();
         }
 
-        private void logbox_SelectedIndexChanged(object sender, EventArgs e)
+        private void Logbox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Clipboard.SetDataObject(this.logBox.SelectedItem.ToString());
+            // Clipboard.SetDataObject(this.logBox.SelectedItem.ToString());
         }
 
     }

@@ -46,10 +46,7 @@ public class Converter
     {
         Log("Checking local items...");
         var counter = 0;
-        string baseItemsPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-            "Trackmania", "Items", "0-B-NoUpload", "MacroblockConverter"
-            );
+        string baseItemsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Trackmania", "Items");
         
         foreach (KeyValuePair<string, Dictionary<string, string>> mapping in conversions)
         {
@@ -80,6 +77,10 @@ public class Converter
                                 (int)Math.Round((maxz - minz) / 32));
                     }
                     itemInfo[entry.Key] = (item.Ident.Author, pivot, size);
+                } else
+                {
+                    Log(itemPath);
+
                 }
             }
         }
@@ -219,7 +220,7 @@ public class Converter
             if (blockToItem.ContainsKey(block.BlockModel.Id))
             {
                 var objectSpawn = new CGameCtnMacroBlockInfo.ObjectSpawn();
-                var itemPath = "0-B-NoUpload/MacroblockConverter/" + blockToItem[block.BlockModel.Id];
+                var itemPath = blockToItem[block.BlockModel.Id];
                 (var author, var pivot, var size) = itemInfo[block.BlockModel.Id];
                 objectSpawn.ItemModel = new Ident(itemPath.Replace('/', '\\'), 26, author);
                 objectSpawn.PivotPosition = pivot;
