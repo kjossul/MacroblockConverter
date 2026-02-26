@@ -7,6 +7,15 @@
         mc:Ignorable="d"
         ResizeMode="CanMinimize"
         Title="Macroblock Converter" Height="540" Width="960">
+    <Window.Resources>
+        <DrawingImage x:Key="iconmonstr_github_1DrawingImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
+                    <GeometryDrawing Brush="#FF000000" Geometry="F1 M24,24z M0,0z M12,0C5.374,0 0,5.373 0,12 0,17.302 3.438,21.8 8.207,23.387 8.806,23.498 9,23.126 9,22.81L9,20.576C5.662,21.302 4.967,19.16 4.967,19.16 4.421,17.773 3.634,17.404 3.634,17.404 2.545,16.659 3.717,16.675 3.717,16.675 4.922,16.759 5.556,17.912 5.556,17.912 6.626,19.746 8.363,19.216 9.048,18.909 9.155,18.134 9.466,17.604 9.81,17.305 7.145,17 4.343,15.971 4.343,11.374 4.343,10.063 4.812,8.993 5.579,8.153 5.455,7.85 5.044,6.629 5.696,4.977 5.696,4.977 6.704,4.655 8.997,6.207 9.954,5.941 10.98,5.808 12,5.803 13.02,5.808 14.047,5.941 15.006,6.207 17.297,4.655 18.303,4.977 18.303,4.977 18.956,6.63 18.545,7.851 18.421,8.153 19.191,8.993 19.656,10.064 19.656,11.374 19.656,15.983 16.849,16.998 14.177,17.295 14.607,17.667 15,18.397 15,19.517L15,22.81C15,23.129 15.192,23.504 15.801,23.386 20.566,21.797 24,17.3 24,12 24,5.373 18.627,0 12,0z" />
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+    </Window.Resources>
     <Grid>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="Macroblock Converter" VerticalAlignment="Top" Height="35" Width="252" FontWeight="Bold" FontSize="24" Margin="0,10,0,0"/>
         <Button x:Name="btnFileExplorer" HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Height="25" Width="143" Click="Button_File_Click" Content="Choose file"/>
@@ -55,7 +64,7 @@
             </Rectangle.RenderTransform>
         </Rectangle>
         <CheckBox x:Name="TransitionsCheckbox" Content="Transitions" HorizontalAlignment="Left" Margin="423,178,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
-        <TextBlock HorizontalAlignment="Left" Margin="879,17,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="16" FontWeight="Bold">
+        <TextBlock HorizontalAlignment="Left" Margin="862,16,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="16" FontWeight="Bold">
             <Hyperlink NavigateUri="https://github.com/kjossul/MacroblockConverter/" RequestNavigate="OpenGithub">
                 Github
             </Hyperlink>
@@ -88,6 +97,6 @@
         <Label Content="Note: source collection is skipped &#xD;&#xA;automatically, no need to uncheck it." HorizontalAlignment="Left" Margin="734,176,0,0" VerticalAlignment="Top" Foreground="#B2000000" Height="44"/>
         <CheckBox x:Name="HillsShortCheckbox" Content="HillsShort" HorizontalAlignment="Left" Margin="331,178,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="True" IsEnabled="False"/>
         <CheckBox x:Name="CustomCheckbox" Content="Custom" HorizontalAlignment="Left" Margin="331,238,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-1.587" IsChecked="False" IsEnabled="False"/>
-
+        <Image Source="{StaticResource iconmonstr_github_1DrawingImage}" HorizontalAlignment="Left" Height="23" Margin="834,16,0,0" VerticalAlignment="Top" Width="23"/>
     </Grid>
 </Window>

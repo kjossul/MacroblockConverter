@@ -28,8 +28,4 @@
     <PackageReference Include="GBX.NET.LZO" Version="2.1.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Screenshots\" />
-  </ItemGroup>
-
 </Project>
